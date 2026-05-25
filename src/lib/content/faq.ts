@@ -12,7 +12,7 @@ export const FAQ_ITEMS = [
   {
     question: "What is included in the nightly rate?",
     answer:
-      "The base rate of $150/night covers 2 guests. Each additional guest is $25 per person per night. All payments are collected upfront at checkout after approval.",
+      "Main bedroom stays start at $150/night for 2 guests. Two-bedroom stays start at $200/night for 2 guests. Each additional guest is $25 per person per night. All payments are collected upfront at checkout after approval.",
   },
   {
     question: "Can I request early check-in or late check-out?",

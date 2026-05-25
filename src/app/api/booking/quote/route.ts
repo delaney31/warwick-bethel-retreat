@@ -9,7 +9,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: parsed.error }, { status: 400 });
     }
 
-    const result = computeStayQuote(parsed.checkIn, parsed.checkOut, parsed.guestCount);
+    const result = computeStayQuote(
+      parsed.checkIn,
+      parsed.checkOut,
+      parsed.guestCount,
+      parsed.roomPackage,
+    );
     if ("error" in result) {
       return NextResponse.json(
         { error: result.error, fields: result.fields },

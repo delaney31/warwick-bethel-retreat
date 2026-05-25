@@ -18,6 +18,7 @@ async function main() {
       guestName: "Sample Guest",
       email: "guest@example.com",
       phone: "5551234567",
+      roomPackage: "MAIN_BEDROOM",
       guestCount: 2,
       checkIn: new Date("2026-07-01"),
       checkOut: new Date("2026-07-03"),

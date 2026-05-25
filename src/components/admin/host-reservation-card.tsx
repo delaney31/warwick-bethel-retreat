@@ -12,6 +12,7 @@ import {
   StickyNote,
   Users,
   XCircle,
+  BedDouble,
 } from "lucide-react";
 import {
   approveHostReservation,
@@ -123,6 +124,11 @@ export function HostReservationCard({
           <Detail icon={Calendar} label="Check-in" value={checkInLabel} />
           <Detail icon={Calendar} label="Check-out" value={checkOutLabel} />
           <Detail icon={Users} label="Guests" value={String(reservation.guestCount)} />
+          <Detail
+            icon={BedDouble}
+            label="Stay option"
+            value={reservation.roomPackageLabel}
+          />
           <Detail icon={Mail} label="Email" value={reservation.email} href={`mailto:${reservation.email}`} />
           <Detail icon={Phone} label="Phone" value={reservation.phone} href={`tel:${reservation.phone}`} />
           <Detail

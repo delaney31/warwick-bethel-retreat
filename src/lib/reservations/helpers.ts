@@ -1,16 +1,19 @@
-/** Nightly base rate (includes up to 2 guests). */
-export const DEFAULT_BASE_RATE = 150;
-/** Per-night surcharge per guest above 2. */
-export const DEFAULT_EXTRA_GUEST_NIGHTLY = 25;
-export const GUESTS_INCLUDED = 2;
+import {
+  calculateStayPricing,
+  EXTRA_GUEST_NIGHTLY,
+  getBaseRateForPackage,
+  GUESTS_INCLUDED,
+  StayPackage,
+  type StayPackageId,
+  type StayPricing,
+} from "@/lib/pricing/stay-packages";
 
-export interface ReservationPricing {
-  nights: number;
-  baseRate: number;
-  extraGuestFee: number;
-  totalAmount: number;
-  extraGuests: number;
-}
+/** @deprecated Use getBaseRateForPackage(StayPackage.MAIN_BEDROOM) */
+export const DEFAULT_BASE_RATE = getBaseRateForPackage(StayPackage.MAIN_BEDROOM);
+export const DEFAULT_EXTRA_GUEST_NIGHTLY = EXTRA_GUEST_NIGHTLY;
+export { GUESTS_INCLUDED };
+
+export type ReservationPricing = StayPricing;
 
 function parseDateOnly(iso: string): Date {
   const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
@@ -42,30 +45,11 @@ export function checkDateOverlap(
   return a0 < b1 && b0 < a1;
 }
 
-/**
- * Server-authoritative pricing: $150/night (up to 2 guests) + $25/night per extra guest.
- * Returns null when check-out is not after check-in.
- */
 export function calculateReservationTotal(
   guestCount: number,
   checkIn: string,
   checkOut: string,
-  baseRatePerNight: number = DEFAULT_BASE_RATE,
-  extraGuestNightly: number = DEFAULT_EXTRA_GUEST_NIGHTLY,
+  stayPackage: StayPackageId = StayPackage.MAIN_BEDROOM,
 ): ReservationPricing | null {
-  const nights = getNights(checkIn, checkOut);
-  if (nights <= 0) return null;
-
-  const extraGuests = Math.max(0, guestCount - GUESTS_INCLUDED);
-  const basePortion = baseRatePerNight * nights;
-  const extraGuestFee = extraGuests * extraGuestNightly * nights;
-  const totalAmount = basePortion + extraGuestFee;
-
-  return {
-    nights,
-    baseRate: baseRatePerNight,
-    extraGuestFee,
-    totalAmount,
-    extraGuests,
-  };
+  return calculateStayPricing(guestCount, checkIn, checkOut, stayPackage);
 }

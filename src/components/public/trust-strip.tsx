@@ -1,8 +1,7 @@
 const ITEMS = [
   "15 min to Warwick Bethel",
-  "2 bedrooms",
-  "1.5 baths",
-  "$150/night for 2 guests",
+  "Main bedroom from $150/night",
+  "Two bedrooms from $200/night",
   "+$25 extra guest/night",
   "Host-reviewed bookings",
 ] as const;

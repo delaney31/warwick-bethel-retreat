@@ -3,6 +3,8 @@ import type { FieldError } from "@/lib/validation/booking";
 export interface BookingQuote {
   nights: number;
   guestCount: number;
+  roomPackage: string;
+  roomPackageLabel: string;
   baseRatePerNight: number;
   baseStayTotal: number;
   extraGuests: number;
@@ -59,6 +61,7 @@ export async function fetchBookingQuote(body: {
   checkIn: string;
   checkOut: string;
   guestCount: number;
+  roomPackage: string;
 }): Promise<BookingQuote | BookingApiError> {
   const res = await fetch("/api/booking/quote", {
     method: "POST",
@@ -84,6 +87,7 @@ export async function submitBookingRequest(body: {
   guestName: string;
   guestEmail: string;
   guestPhone: string;
+  roomPackage: string;
   checkIn: string;
   checkOut: string;
   guestCount: number;

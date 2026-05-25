@@ -9,6 +9,7 @@ export interface GuestReservationPaymentView {
   checkOut: string;
   nights: number;
   guestCount: number;
+  roomPackageLabel: string;
   totalAmount: number;
   status: ReservationDbStatus;
   notes: string | null;
@@ -36,6 +37,7 @@ export async function getGuestReservationPaymentView(
     checkOut: r.checkOut,
     nights: r.nights,
     guestCount: r.guestCount,
+    roomPackageLabel: r.roomPackageLabel,
     totalAmount: r.totalAmount,
     status: r.status,
     notes: r.notes,

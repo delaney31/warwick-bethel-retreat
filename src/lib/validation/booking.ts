@@ -1,4 +1,12 @@
 import type { BookingRequestFormData } from "@/types/reservation";
+import {
+  EXTRA_GUEST_NIGHTLY,
+  getBaseRateForPackage,
+  GUESTS_INCLUDED,
+  isStayPackageId,
+  StayPackage,
+  type StayPackageId,
+} from "@/lib/pricing/stay-packages";
 
 export interface FieldError {
   field: keyof BookingRequestFormData;
@@ -59,14 +67,18 @@ export function validateStayDates(
   return errors;
 }
 
-/** Quote sidebar — dates and guest count only (no contact fields required yet). */
+/** Quote sidebar — dates, guest count, and stay package (no contact fields required yet). */
 export function validateQuoteInput(
   checkIn: string,
   checkOut: string,
   guestCount: number,
   maxGuests: number,
+  roomPackage: string,
 ): FieldError[] {
   const errors = validateStayDates(checkIn, checkOut);
+  if (!isStayPackageId(roomPackage)) {
+    errors.push({ field: "roomPackage", message: "Choose a stay option." });
+  }
   if (!Number.isFinite(guestCount) || guestCount < 1) {
     errors.push({ field: "guestCount", message: "Guest count is required." });
   } else if (guestCount > maxGuests) {
@@ -75,9 +87,14 @@ export function validateQuoteInput(
   return errors;
 }
 
-export function calculateRetreatPricing(guestCount: number, nights: number) {
-  const extraGuests = Math.max(0, guestCount - 2);
-  const nightly = 150 + extraGuests * 25;
+export function calculateRetreatPricing(
+  guestCount: number,
+  nights: number,
+  stayPackage: StayPackageId = StayPackage.MAIN_BEDROOM,
+) {
+  const baseRate = getBaseRateForPackage(stayPackage);
+  const extraGuests = Math.max(0, guestCount - GUESTS_INCLUDED);
+  const nightly = baseRate + extraGuests * EXTRA_GUEST_NIGHTLY;
   return { nights, nightly, subtotal: nightly * nights, extraGuests };
 }
 
@@ -107,6 +124,9 @@ export function validateBookingForm(
     });
   }
   errors.push(...validateStayDates(data.checkIn, data.checkOut));
+  if (!isStayPackageId(data.roomPackage)) {
+    errors.push({ field: "roomPackage", message: "Choose a stay option." });
+  }
   if (data.guestNotes.length > 2000) {
     errors.push({ field: "guestNotes", message: "Notes must be 2000 characters or fewer." });
   }

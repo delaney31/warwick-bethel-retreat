@@ -36,6 +36,7 @@ export interface BookingRequestFormData {
   guestName: string;
   guestEmail: string;
   guestPhone: string;
+  roomPackage: string;
   checkIn: string;
   checkOut: string;
   guestCount: string;

@@ -15,11 +15,17 @@ enum ReservationStatus {
   CANCELLED
 }
 
+enum RoomPackage {
+  MAIN_BEDROOM
+  TWO_BEDROOMS
+}
+
 model Reservation {
   id                      String            @id @default(cuid())
   guestName               String
   email                   String
   phone                   String
+  roomPackage             RoomPackage       @default(MAIN_BEDROOM)
   guestCount              Int
   checkIn                 DateTime          @db.Date
   checkOut                DateTime          @db.Date

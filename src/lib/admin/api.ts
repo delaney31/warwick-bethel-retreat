@@ -5,6 +5,8 @@ export interface HostReservation {
   guestName: string;
   email: string;
   phone: string;
+  roomPackage: string;
+  roomPackageLabel: string;
   guestCount: number;
   checkIn: string;
   checkOut: string;

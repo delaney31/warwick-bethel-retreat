@@ -41,7 +41,18 @@ export default function RoomsPage() {
         </div>
 
         <div className="mt-16 rounded-2xl border border-stone-200 bg-white p-8">
-          <h2 className="text-lg font-medium text-stone-900">Full amenity list</h2>
+          <h2 className="text-lg font-medium text-stone-900">Rates</h2>
+          <ul className="mt-4 space-y-3 text-sm text-stone-600">
+            <li>
+              <strong className="text-stone-900">Main bedroom:</strong> $150/night for 2 guests · +$25/night
+              per extra guest
+            </li>
+            <li>
+              <strong className="text-stone-900">Two bedrooms:</strong> $200/night for 2 guests · +$25/night
+              per extra guest
+            </li>
+          </ul>
+          <h2 className="mt-8 text-lg font-medium text-stone-900">Full amenity list</h2>
           <ul className="mt-4 grid gap-2 sm:grid-cols-2">
             {AMENITIES.map((a) => (
               <li key={a} className="text-sm text-stone-600">· {a}</li>

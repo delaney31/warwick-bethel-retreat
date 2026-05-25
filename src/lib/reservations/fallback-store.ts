@@ -4,6 +4,7 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { randomUUID } from "crypto";
 import { ReservationStatus } from "@prisma/client";
+import type { StayPackageId } from "@/lib/pricing/stay-packages";
 import type { ReservationPricing } from "./helpers";
 
 export interface CreateReservationInput {
@@ -11,6 +12,7 @@ export interface CreateReservationInput {
   email: string;
   phone: string;
   guestCount: number;
+  roomPackage: StayPackageId;
   checkIn: string;
   checkOut: string;
   notes?: string | null;
@@ -23,6 +25,7 @@ export interface FallbackReservationRecord {
   guestName: string;
   email: string;
   phone: string;
+  roomPackage: StayPackageId;
   guestCount: number;
   checkIn: string;
   checkOut: string;
@@ -73,6 +76,7 @@ export async function fallbackCreateReservation(
     email: input.email.trim(),
     phone: input.phone.trim(),
     guestCount: input.guestCount,
+    roomPackage: input.roomPackage,
     checkIn: input.checkIn.slice(0, 10),
     checkOut: input.checkOut.slice(0, 10),
     nights: pricing.nights,

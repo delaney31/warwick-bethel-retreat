@@ -4,6 +4,7 @@ import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { Bath, BedDouble, Calendar, Check, MapPin, Shield, Trees } from "lucide-react";
 import type { BookingQuote } from "@/lib/api/booking-public";
+import { isStayPackageId, getStayPackageLabel } from "@/lib/pricing/stay-packages";
 import { formatCurrency } from "@/lib/validation/booking";
 import { cn } from "@/lib/utils/cn";
 
@@ -34,6 +35,7 @@ export function StaySummaryCard({
   checkIn,
   checkOut,
   guestCount,
+  roomPackage,
   quote,
   quoteLoading,
   availability,
@@ -41,12 +43,16 @@ export function StaySummaryCard({
   checkIn: string;
   checkOut: string;
   guestCount: string;
+  roomPackage: string;
   quote: BookingQuote | null;
   quoteLoading: boolean;
   availability: AvailabilityUi;
 }) {
   const hasDates = Boolean(checkIn && checkOut);
   const guests = parseInt(guestCount, 10) || 0;
+  const packageLabel =
+    quote?.roomPackageLabel ??
+    (isStayPackageId(roomPackage) ? getStayPackageLabel(roomPackage) : "Stay option");
 
   return (
     <aside className="lg:sticky lg:top-28">
@@ -83,12 +89,18 @@ export function StaySummaryCard({
           </div>
 
           {hasDates && guests > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-white/50">Guests</span>
-              <span className="font-medium">
-                {guests} guest{guests !== 1 ? "s" : ""}
-              </span>
-            </div>
+            <>
+              <div className="flex justify-between text-sm">
+                <span className="text-white/50">Stay option</span>
+                <span className="font-medium">{packageLabel}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-white/50">Guests</span>
+                <span className="font-medium">
+                  {guests} guest{guests !== 1 ? "s" : ""}
+                </span>
+              </div>
+            </>
           )}
 
           <div className="border-t border-white/10 pt-5">

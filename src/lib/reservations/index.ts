@@ -1,6 +1,7 @@
 import "server-only";
 
 import { Prisma, ReservationStatus as DbReservationStatus } from "@prisma/client";
+import { getStayPackageLabel, type StayPackageId } from "@/lib/pricing/stay-packages";
 import { prisma } from "@/lib/db/prisma";
 import { isDatabaseConfigured, isProductionRuntime, requireDatabase } from "./db";
 import {
@@ -29,6 +30,7 @@ export interface CreateReservationInput {
   email: string;
   phone: string;
   guestCount: number;
+  roomPackage: StayPackageId;
   checkIn: string;
   checkOut: string;
   notes?: string | null;
@@ -193,7 +195,12 @@ export async function checkAvailabilityForStay(
 
 /** Guest request — always PENDING_REVIEW; may overlap other pending/approved-unpaid stays. */
 export async function createReservationRequest(input: CreateReservationInput) {
-  const pricing = calculateReservationTotal(input.guestCount, input.checkIn, input.checkOut);
+  const pricing = calculateReservationTotal(
+    input.guestCount,
+    input.checkIn,
+    input.checkOut,
+    input.roomPackage,
+  );
   if (!pricing) {
     throw new Error("Invalid date range.");
   }
@@ -204,6 +211,7 @@ export async function createReservationRequest(input: CreateReservationInput) {
         guestName: input.guestName.trim(),
         email: input.email.trim(),
         phone: input.phone.trim(),
+        roomPackage: input.roomPackage,
         guestCount: input.guestCount,
         checkIn: parseDateOnly(input.checkIn),
         checkOut: parseDateOnly(input.checkOut),
@@ -525,6 +533,7 @@ type PersistedReservationRow = {
   guestName: string;
   email: string;
   phone: string;
+  roomPackage: StayPackageId;
   guestCount: number;
   checkIn: Date | string;
   checkOut: Date | string;
@@ -569,6 +578,8 @@ export function serializeReservation(r: PersistedReservationRow | null) {
     guestName: r.guestName,
     email: r.email,
     phone: r.phone,
+    roomPackage: r.roomPackage,
+    roomPackageLabel: getStayPackageLabel(r.roomPackage),
     guestCount: r.guestCount,
     checkIn,
     checkOut,

@@ -8,6 +8,7 @@ export interface GuestReservationView {
   checkOut: string;
   nights: number;
   guestCount: number;
+  roomPackageLabel: string;
   totalAmount: number;
   status: ReservationDbStatus;
   notes: string | null;

@@ -29,7 +29,7 @@ function buildLineItems(
         unit_amount: amountCents,
         product_data: {
           name: "Warwick Bethel Retreat",
-          description: `${reservation.nights} night${reservation.nights !== 1 ? "s" : ""} · ${reservation.checkIn} → ${reservation.checkOut} · ${reservation.guestCount} guest${reservation.guestCount !== 1 ? "s" : ""}`,
+          description: `${reservation.roomPackageLabel} · ${reservation.nights} night${reservation.nights !== 1 ? "s" : ""} · ${reservation.checkIn} → ${reservation.checkOut} · ${reservation.guestCount} guest${reservation.guestCount !== 1 ? "s" : ""}`,
         },
       },
       quantity: 1,

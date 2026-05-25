@@ -11,6 +11,7 @@ import {
   type BookingSubmitSuccess,
 } from "@/lib/api/booking-public";
 import { MAX_GUESTS } from "@/lib/constants";
+import { StayPackage, type StayPackageId } from "@/lib/pricing/stay-packages";
 import {
   validateBookingForm,
   todayISO,
@@ -20,6 +21,7 @@ import type { BookingRequestFormData } from "@/types/reservation";
 import { ReservationStatus } from "@/types/reservation";
 import { useReservationStore } from "@/lib/store/reservation-store";
 import { StaySummaryCard } from "@/components/public/stay-summary-card";
+import { StayPackageSelector } from "@/components/public/stay-package-selector";
 import { BookingConfirmation } from "@/components/public/booking-confirmation";
 import { FormField } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
@@ -29,6 +31,7 @@ const EMPTY: BookingRequestFormData = {
   guestName: "",
   guestEmail: "",
   guestPhone: "",
+  roomPackage: StayPackage.MAIN_BEDROOM,
   checkIn: "",
   checkOut: "",
   guestCount: "2",
@@ -77,7 +80,7 @@ function BookingRequestFormInner() {
       setAvailability({ status: "idle" });
       setQuote(null);
     }
-    if (field === "guestCount") setQuote(null);
+    if (field === "guestCount" || field === "roomPackage") setQuote(null);
   }
 
   useEffect(() => {
@@ -126,7 +129,12 @@ function BookingRequestFormInner() {
 
     const timer = setTimeout(() => {
       setQuoteLoading(true);
-      fetchBookingQuote({ checkIn: form.checkIn, checkOut: form.checkOut, guestCount: guests })
+      fetchBookingQuote({
+        checkIn: form.checkIn,
+        checkOut: form.checkOut,
+        guestCount: guests,
+        roomPackage: form.roomPackage,
+      })
         .then((r) => {
           if (isBookingApiError(r)) {
             setQuote(null);
@@ -138,7 +146,7 @@ function BookingRequestFormInner() {
         .finally(() => setQuoteLoading(false));
     }, 400);
     return () => clearTimeout(timer);
-  }, [form.checkIn, form.checkOut, form.guestCount]);
+  }, [form.checkIn, form.checkOut, form.guestCount, form.roomPackage]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -156,6 +164,7 @@ function BookingRequestFormInner() {
         guestName: form.guestName.trim(),
         guestEmail: form.guestEmail.trim(),
         guestPhone: form.guestPhone.trim(),
+        roomPackage: form.roomPackage,
         checkIn: form.checkIn,
         checkOut: form.checkOut,
         guestCount: parseInt(form.guestCount, 10),
@@ -182,7 +191,7 @@ function BookingRequestFormInner() {
         driverAge: result.guestCount,
         notes: form.guestNotes,
         rentalDays: result.nights,
-        dailyRateAtBooking: 150,
+        dailyRateAtBooking: result.subtotal / Math.max(result.nights, 1),
         subtotal: result.subtotal,
         createdAt: new Date().toISOString(),
       });
@@ -257,7 +266,13 @@ function BookingRequestFormInner() {
 
           <div>
             <h3 className="font-serif text-lg font-light text-stone-900">Your stay</h3>
-            <div className="mt-4 grid gap-5 sm:grid-cols-2">
+            <div className="mt-4 space-y-5">
+              <StayPackageSelector
+                value={form.roomPackage as StayPackageId}
+                onChange={(roomPackage) => update("roomPackage", roomPackage)}
+                error={fieldError("roomPackage")}
+              />
+            <div className="grid gap-5 sm:grid-cols-2">
               <FormField
                 label="Guests"
                 name="guestCount"
@@ -293,6 +308,7 @@ function BookingRequestFormInner() {
                 error={fieldError("checkOut")}
                 required
               />
+            </div>
             </div>
           </div>
 
@@ -331,6 +347,7 @@ function BookingRequestFormInner() {
         checkIn={form.checkIn}
         checkOut={form.checkOut}
         guestCount={form.guestCount}
+        roomPackage={form.roomPackage}
         quote={quote}
         quoteLoading={quoteLoading}
         availability={availability}

@@ -1,4 +1,10 @@
 import { MAX_GUESTS } from "@/lib/constants";
+import {
+  getStayPackageLabel,
+  parseStayPackageId,
+  StayPackage,
+  type StayPackageId,
+} from "@/lib/pricing/stay-packages";
 import type { FieldError } from "@/lib/validation/booking";
 import { validateBookingForm, validateQuoteInput } from "@/lib/validation/booking";
 import {
@@ -11,6 +17,7 @@ import {
 } from "@/lib/reservations";
 
 export const BOOKING_BASE_RATE = 150;
+export const BOOKING_TWO_BEDROOM_RATE = 200;
 export const BOOKING_EXTRA_GUEST_RATE = 25;
 export const BOOKING_GUESTS_INCLUDED = 2;
 
@@ -18,6 +25,7 @@ export interface BookingPayload {
   guestName: string;
   guestEmail: string;
   guestPhone: string;
+  roomPackage: StayPackageId;
   checkIn: string;
   checkOut: string;
   guestCount: number;
@@ -27,6 +35,8 @@ export interface BookingPayload {
 export interface QuoteResult {
   nights: number;
   guestCount: number;
+  roomPackage: StayPackageId;
+  roomPackageLabel: string;
   baseRatePerNight: number;
   baseStayTotal: number;
   extraGuests: number;
@@ -42,6 +52,7 @@ export interface BookingSuccessResult {
   nights: number;
   subtotal: number;
   guestCount: number;
+  roomPackage: StayPackageId;
   message: string;
 }
 
@@ -54,11 +65,16 @@ export function parseBookingBody(body: unknown): BookingPayload | { error: strin
     typeof b.guestCount === "number"
       ? b.guestCount
       : parseInt(String(b.guestCount ?? ""), 10);
+  const roomPackage = parseStayPackageId(b.roomPackage);
+  if (!roomPackage) {
+    return { error: "Invalid stay option." };
+  }
 
   return {
     guestName: String(b.guestName ?? "").trim(),
     guestEmail: String(b.guestEmail ?? "").trim(),
     guestPhone: String(b.guestPhone ?? "").trim(),
+    roomPackage,
     checkIn: String(b.checkIn ?? "").trim(),
     checkOut: String(b.checkOut ?? "").trim(),
     guestCount: Number.isFinite(guestCount) ? guestCount : NaN,
@@ -72,6 +88,7 @@ export function validateBookingPayload(payload: BookingPayload): FieldError[] {
       guestName: payload.guestName,
       guestEmail: payload.guestEmail,
       guestPhone: payload.guestPhone,
+      roomPackage: payload.roomPackage,
       checkIn: payload.checkIn,
       checkOut: payload.checkOut,
       guestCount: String(payload.guestCount),
@@ -86,7 +103,7 @@ export function computeQuote(payload: BookingPayload): QuoteResult | { error: st
   if (fieldErrors.length) {
     return { error: "Please fix the highlighted fields.", fields: fieldErrors };
   }
-  return computeStayQuote(payload.checkIn, payload.checkOut, payload.guestCount);
+  return computeStayQuote(payload.checkIn, payload.checkOut, payload.guestCount, payload.roomPackage);
 }
 
 /** Server-side estimate from stay dates only — used by /api/booking/quote before contact fields are filled. */
@@ -94,12 +111,13 @@ export function computeStayQuote(
   checkIn: string,
   checkOut: string,
   guestCount: number,
+  roomPackage: StayPackageId = StayPackage.MAIN_BEDROOM,
 ): QuoteResult | { error: string; fields?: FieldError[] } {
-  const fieldErrors = validateQuoteInput(checkIn, checkOut, guestCount, MAX_GUESTS);
+  const fieldErrors = validateQuoteInput(checkIn, checkOut, guestCount, MAX_GUESTS, roomPackage);
   if (fieldErrors.length) {
-    return { error: "Please choose valid dates and guest count.", fields: fieldErrors };
+    return { error: "Please choose valid dates, guests, and stay option.", fields: fieldErrors };
   }
-  const pricing = calculateReservationTotal(guestCount, checkIn, checkOut);
+  const pricing = calculateReservationTotal(guestCount, checkIn, checkOut, roomPackage);
   if (!pricing) {
     return {
       error: "Check-out must be after check-in (at least one night).",
@@ -114,6 +132,8 @@ export function computeStayQuote(
   return {
     nights: pricing.nights,
     guestCount,
+    roomPackage,
+    roomPackageLabel: getStayPackageLabel(roomPackage),
     baseRatePerNight: pricing.baseRate,
     baseStayTotal: pricing.baseRate * pricing.nights,
     extraGuests: pricing.extraGuests,
@@ -122,17 +142,24 @@ export function computeStayQuote(
   };
 }
 
-export function parseQuoteBody(body: unknown): { checkIn: string; checkOut: string; guestCount: number } | { error: string } {
+export function parseQuoteBody(
+  body: unknown,
+): { checkIn: string; checkOut: string; guestCount: number; roomPackage: StayPackageId } | { error: string } {
   if (!body || typeof body !== "object") {
     return { error: "Invalid request body." };
   }
   const b = body as Record<string, unknown>;
   const guestCount =
     typeof b.guestCount === "number" ? b.guestCount : parseInt(String(b.guestCount ?? ""), 10);
+  const roomPackage = parseStayPackageId(b.roomPackage);
+  if (!roomPackage) {
+    return { error: "Invalid stay option." };
+  }
   return {
     checkIn: String(b.checkIn ?? "").trim(),
     checkOut: String(b.checkOut ?? "").trim(),
     guestCount: Number.isFinite(guestCount) ? guestCount : NaN,
+    roomPackage,
   };
 }
 
@@ -187,6 +214,7 @@ export async function createRetreatReservation(
       email: payload.guestEmail,
       phone: payload.guestPhone,
       guestCount: payload.guestCount,
+      roomPackage: payload.roomPackage,
       checkIn: payload.checkIn,
       checkOut: payload.checkOut,
       notes: payload.guestNotes || null,
@@ -208,6 +236,7 @@ export async function createRetreatReservation(
       nights: row.nights,
       subtotal: row.totalAmount,
       guestCount: row.guestCount,
+      roomPackage: row.roomPackage,
       message:
         "Your request has been received. We'll review your stay and follow up with payment instructions if approved.",
     };

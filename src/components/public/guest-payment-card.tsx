@@ -39,6 +39,10 @@ export function GuestPaymentCard({ reservation }: { reservation: GuestReservatio
           <dd>{reservation.nights}</dd>
         </div>
         <div className="flex justify-between gap-4">
+          <dt className="text-stone-500">Stay option</dt>
+          <dd className="text-right font-medium text-stone-900">{reservation.roomPackageLabel}</dd>
+        </div>
+        <div className="flex justify-between gap-4">
           <dt className="text-stone-500">Guests</dt>
           <dd>{reservation.guestCount}</dd>
         </div>
