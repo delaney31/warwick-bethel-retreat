@@ -1,16 +1,16 @@
-/** Property imagery — place your photos in public/images/property/ with these filenames. */
+/** Property imagery — photos in public/images/property/ */
 export const PROPERTY_IMAGES = {
-  hero: "/images/property/hero.jpg",
-  living: "/images/property/living-vaulted.jpg",
-  bedroom: "/images/property/bedroom-pink.jpg",
-  deck: "/images/property/outdoor-deck.jpg",
-  daybed: "/images/property/cozy-daybed.jpg",
-  windows: "/images/property/natural-light.jpg",
-  floors: "/images/property/hardwood.jpg",
-  kitchen: "/images/property/coffee-station.jpg",
+  hero: "/images/property/hero.png",
+  living: "/images/property/living-vaulted.png",
+  bedroom: "/images/property/bedroom-pink.png",
+  deck: "/images/property/outdoor-deck.png",
+  daybed: "/images/property/cozy-daybed.png",
+  windows: "/images/property/bedroom-master.png",
+  floors: "/images/property/bedroom-guest.png",
+  kitchen: "/images/property/kitchenette.png",
 } as const;
 
-/** Unsplash fallbacks until local photos are added */
+/** Unsplash fallbacks if a local file fails to load */
 export const PROPERTY_IMAGE_FALLBACKS: Record<keyof typeof PROPERTY_IMAGES, string> = {
   hero: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=85",
   living: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=85",
@@ -27,15 +27,19 @@ export function getPropertyImage(key: keyof typeof PROPERTY_IMAGES): string {
 }
 
 export const GALLERY_IMAGES = [
-  { src: PROPERTY_IMAGES.hero, alt: "Luxury cottage exterior in wooded setting", key: "hero" as const },
-  { src: PROPERTY_IMAGES.living, alt: "Vaulted ceilings and natural light in living area", key: "living" as const },
-  { src: PROPERTY_IMAGES.bedroom, alt: "Premium bedding in serene bedroom", key: "bedroom" as const },
-  { src: PROPERTY_IMAGES.deck, alt: "Wooded outdoor deck surrounded by trees", key: "deck" as const },
-  { src: PROPERTY_IMAGES.daybed, alt: "Cozy daybed reading nook", key: "daybed" as const },
-  { src: PROPERTY_IMAGES.windows, alt: "Large windows with scenic woodland views", key: "windows" as const },
-  { src: PROPERTY_IMAGES.floors, alt: "Hardwood floors and warm minimal interiors", key: "floors" as const },
-  { src: PROPERTY_IMAGES.kitchen, alt: "Coffee station and kitchenette amenities", key: "kitchen" as const },
-];
+  { src: "/images/property/hero.png", alt: "Warwick Bethel Retreat — luxury home exterior in a wooded setting", key: "hero" as const },
+  { src: "/images/property/living-vaulted.png", alt: "Vaulted studio living area with deck access and garden views", key: "living" as const },
+  { src: "/images/property/living-studio.png", alt: "Bright studio suite with dining table, retro kitchenette, and hardwood floors", key: "living" as const },
+  { src: "/images/property/bedroom-pink.png", alt: "Serene bedroom with premium bedding and woodland views", key: "bedroom" as const },
+  { src: "/images/property/bedroom-master.png", alt: "Spacious master bedroom with vaulted ceilings and private deck door", key: "windows" as const },
+  { src: "/images/property/bedroom-window.png", alt: "Guest bedroom with in-room coffee station and forest views", key: "kitchen" as const },
+  { src: "/images/property/bedroom-guest.png", alt: "Flexible guest room with queen and twin beds — sleeps families comfortably", key: "floors" as const },
+  { src: "/images/property/bedroom-daybed-room.png", alt: "Cozy second bedroom with daybed, TV, and woven accents", key: "daybed" as const },
+  { src: "/images/property/cozy-daybed.png", alt: "Floral daybed nook with natural light and reading space", key: "daybed" as const },
+  { src: "/images/property/kitchenette.png", alt: "Kitchenette with mini fridge, coffee maker, and curated breakfast station", key: "kitchen" as const },
+  { src: "/images/property/coffee-station.png", alt: "Keurig coffee station, toaster, and storage in the guest suite", key: "kitchen" as const },
+  { src: "/images/property/outdoor-deck.png", alt: "Private wooded deck with Adirondack seating overlooking the garden", key: "deck" as const },
+] as const;
 
 export const AMENITIES = [
   "2 Bedrooms · 1.5 Bathrooms",

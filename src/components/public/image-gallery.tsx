@@ -31,10 +31,10 @@ export function ImageGallery() {
           </motion.div>
         </AnimatePresence>
       </div>
-      <div className="grid grid-cols-4 gap-2 md:grid-cols-8">
+      <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-12">
         {GALLERY_IMAGES.map((img, i) => (
           <button
-            key={img.alt}
+            key={`${img.src}-${i}`}
             type="button"
             onClick={() => setActive(i)}
             className={cn(

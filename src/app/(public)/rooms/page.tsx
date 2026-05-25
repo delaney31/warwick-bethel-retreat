@@ -19,12 +19,14 @@ export default function RoomsPage() {
           immersed in wooded quiet — designed for rest between Bethel days.
         </p>
 
-        <div className="mt-16 grid gap-8 md:grid-cols-2">
+        <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { src: PROPERTY_IMAGES.bedroom, key: "bedroom" as const, title: "Bedrooms", desc: "Pink luxury bedding, soft lighting, restful atmosphere for 2 included guests." },
-            { src: PROPERTY_IMAGES.deck, key: "deck" as const, title: "Wooded Deck", desc: "Beautiful outdoor deck surrounded by trees — morning coffee, evening calm." },
+            { src: PROPERTY_IMAGES.living, key: "living" as const, title: "Studio Living", desc: "Vaulted ceilings, hardwood floors, and garden views through the arched deck door." },
+            { src: PROPERTY_IMAGES.bedroom, key: "bedroom" as const, title: "Bedrooms", desc: "Premium bedding, soft lighting, and flexible sleeping for families or groups." },
+            { src: PROPERTY_IMAGES.deck, key: "deck" as const, title: "Wooded Deck", desc: "Private deck with Adirondack seating — morning coffee, evening calm." },
             { src: PROPERTY_IMAGES.daybed, key: "daybed" as const, title: "Cozy Daybed", desc: "Reading nook with natural light — perfect for quiet reflection." },
-            { src: PROPERTY_IMAGES.kitchen, key: "kitchen" as const, title: "Kitchenette", desc: "Microwave, mini fridge, and a curated coffee station." },
+            { src: PROPERTY_IMAGES.kitchen, key: "kitchen" as const, title: "Kitchenette", desc: "Mini fridge, microwave, Keurig, and a curated coffee station." },
+            { src: PROPERTY_IMAGES.windows, key: "windows" as const, title: "Master Suite", desc: "Spacious room with deck access, workspace, and woodland views." },
           ].map((room) => (
             <article key={room.title} className="overflow-hidden rounded-2xl bg-white shadow-lg">
               <div className="relative aspect-[4/3]">
