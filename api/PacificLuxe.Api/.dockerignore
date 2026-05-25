@@ -1,0 +1,21 @@
+# Build context: api/PacificLuxe.Api/ (Render Root Directory)
+
+bin/
+obj/
+out/
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+TestResults/
+.git/
+.gitignore
+.DS_Store
+
+# Do not bake dev secrets into the image
+appsettings.Development.json
+
+# Avoid copying the Dockerfile into publish layers via COPY .
+Dockerfile
+.dockerignore

@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sage-50: #f6f8f5;
+  --color-sage-100: #e8ede5;
+  --color-sage-200: #d1dbc9;
+  --color-sage-300: #b0c0a3;
+  --color-sage-400: #8fa37c;
+  --color-sage-500: #6f8660;
+  --color-sage-600: #566b4a;
+  --color-sage-700: #44543c;
+  --color-sage-800: #384532;
+  --color-sage-900: #2f3a2b;
+
+  --color-stone-50: #faf9f7;
+  --color-stone-100: #f3f0eb;
+  --color-stone-200: #e6e0d6;
+  --color-stone-300: #d4cab8;
+  --color-stone-400: #b8a992;
+  --color-stone-500: #9d8b72;
+  --color-stone-600: #85725d;
+  --color-stone-700: #6d5d4d;
+  --color-stone-800: #5a4d41;
+  --color-stone-900: #4a4037;
+  --color-stone-950: #2a241f;
+
+  --color-amber-50: #fdf8ef;
+  --color-amber-100: #f9eed8;
+  --color-amber-200: #f2dbad;
+  --color-amber-300: #e8c27a;
+  --color-amber-400: #dda855;
+  --color-amber-500: #c9923f;
+  --color-amber-600: #a67432;
+  --color-amber-700: #855a2c;
+  --color-amber-800: #6d4928;
+  --color-amber-900: #5a3d24;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--color-stone-900);
+  background-color: var(--color-stone-50);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.font-serif {
+  font-family: var(--font-serif), Georgia, serif;
+}
+
+::selection {
+  background-color: var(--color-amber-300);
+  color: var(--color-stone-950);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}

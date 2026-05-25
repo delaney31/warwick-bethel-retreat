@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+.pnp.*
+
+# next.js
+.next/
+out/
+
+# production
+build/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+!.env.deploy.example
+.env.deploy
+
+# vercel
+.vercel/
+
+# api
+api/**/bin/
+api/**/obj/
+api/**/*.db
+api/**/*.db-*
+
+# misc
+.DS_Store
+*.log
+*.tsbuildinfo
+next-env.d.ts

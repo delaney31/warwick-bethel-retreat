@@ -1,0 +1,39 @@
+# Render Blueprint — Warwick Bethel Retreat API
+# https://render.com/docs/blueprint-spec
+#
+# Deploy: Render Dashboard → New → Blueprint → connect PacificLuxeRentals repo
+# Or: render blueprint launch (CLI)
+#
+# Pacific Luxe vehicle API should remain a SEPARATE existing Render service.
+# This blueprint only provisions the RETREAT stack.
+
+services:
+  - type: web
+    name: warwick-retreat-api
+    runtime: docker
+    region: oregon
+    plan: starter
+    branch: main
+    rootDir: api/PacificLuxe.Api
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ProductLine__Value
+        value: Retreat
+      - key: SeedFleet
+        value: "false"
+      - key: SeedRetreat
+        value: "true"
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__SigningKey
+        generateValue: true
+      - key: AdminSeed__Email
+        value: admin@warwickbethelretreat.com
+      - key: AdminSeed__Password
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false

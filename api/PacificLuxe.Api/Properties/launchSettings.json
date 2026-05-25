@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5001",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "retreat": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5002",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ProductLine__Value": "Retreat",
+        "SeedFleet": "false",
+        "ConnectionStrings__DefaultConnection": "Data Source=warwick_bethel_retreat.db"
+      }
+    },
+    "retreat-postgres": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5002",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ProductLine__Value": "Retreat",
+        "SeedFleet": "false",
+        "ConnectionStrings__DefaultConnection": "Host=localhost;Port=5433;Database=warwick_bethel_retreat;Username=wbr;Password=localdev"
+      }
+    }
+  }
+}

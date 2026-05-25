@@ -1,0 +1,19 @@
+# Optional: remind to set FRONTEND_URL on Render after Vercel deploy.
+# Render API updates require dashboard or Render API key — not automated here.
+
+name: Warwick — post-deploy checklist
+
+on:
+  workflow_run:
+    workflows: [Deploy Warwick Bethel Retreat]
+    types: [completed]
+
+jobs:
+  note:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Update Render warwick-retreat-api env:"
+          echo "  FRONTEND_URL = your Vercel production origin"
+          echo "  ConnectionStrings__DefaultConnection = Neon retreat DB URL"
