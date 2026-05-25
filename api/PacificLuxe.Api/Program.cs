@@ -20,10 +20,37 @@ using PacificLuxe.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Heroku/Render-style DATABASE_URL → ConnectionStrings:DefaultConnection
-var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-if (!string.IsNullOrWhiteSpace(databaseUrl))
-    builder.Configuration["ConnectionStrings:DefaultConnection"] = databaseUrl;
+// Heroku/Render/Neon: prefer raw DATABASE_URL (avoids .NET env config splitting on '=' in ?sslmode=require).
+static string ResolveDefaultConnection(IConfiguration config)
+{
+    var raw = Environment.GetEnvironmentVariable("DATABASE_URL");
+    if (string.IsNullOrWhiteSpace(raw))
+        raw = config.GetConnectionString("DefaultConnection");
+
+    if (string.IsNullOrWhiteSpace(raw))
+        throw new InvalidOperationException(
+            "Database connection not configured. Set DATABASE_URL or ConnectionStrings__DefaultConnection.");
+
+    raw = raw.Replace("&channel_binding=require", "", StringComparison.OrdinalIgnoreCase);
+    return ToNpgsqlConnectionString(raw);
+}
+
+static string ToNpgsqlConnectionString(string connection)
+{
+    if (!connection.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) &&
+        !connection.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+        return connection;
+
+    var uri = new Uri(connection);
+    var userInfo = uri.UserInfo.Split(':', 2);
+    var username = Uri.UnescapeDataString(userInfo[0]);
+    var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
+    var database = uri.AbsolutePath.TrimStart('/');
+    var port = uri.Port > 0 ? uri.Port : 5432;
+    var ssl = uri.Query.Contains("sslmode=require", StringComparison.OrdinalIgnoreCase) ? "Require" : "Prefer";
+
+    return $"Host={uri.Host};Port={port};Database={database};Username={username};Password={password};Ssl Mode={ssl}";
+}
 
 // Render, Fly.io, etc. set PORT — listen on all interfaces (required in containers).
 var port = Environment.GetEnvironmentVariable("PORT");
@@ -42,7 +69,7 @@ if (signingKey.Length < 32)
 }
 
 // ─── Database ──────────────────────────────────────────────
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+var connectionString = ResolveDefaultConnection(builder.Configuration);
 var useSqlite = connectionString.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase);
 
 builder.Services.AddDbContext<AppDbContext>(opts =>
@@ -160,13 +187,12 @@ var app = builder.Build();
 
 if (app.Environment.IsProduction())
 {
-    var cs = app.Configuration.GetConnectionString("DefaultConnection");
+    var cs = ResolveDefaultConnection(app.Configuration);
     if (string.IsNullOrWhiteSpace(cs))
     {
         throw new InvalidOperationException(
-            "Database not configured for production. Set environment variable ConnectionStrings__DefaultConnection " +
-            "to your PostgreSQL connection string. On Render: add a PostgreSQL instance, link it to this service, " +
-            "or paste the Internal Database URL into Environment → ConnectionStrings__DefaultConnection.");
+            "Database not configured for production. Set DATABASE_URL or ConnectionStrings__DefaultConnection " +
+            "to your Neon/PostgreSQL connection string (Render: paste the pooled Neon URL).");
     }
 
     if (cs.Contains("localhost", StringComparison.OrdinalIgnoreCase) ||
@@ -183,7 +209,7 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
-    var conn = app.Configuration.GetConnectionString("DefaultConnection")!;
+    var conn = ResolveDefaultConnection(app.Configuration);
     var isSqlite = conn.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase);
     // Local SQLite: schema without migrations (do not mix EnsureCreated with Migrate on the same DB).
     if (isSqlite)
@@ -205,7 +231,7 @@ if (app.Environment.IsDevelopment())
     await using var scope = app.Services.CreateAsyncScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
-    var conn = app.Configuration.GetConnectionString("DefaultConnection")!;
+    var conn = ResolveDefaultConnection(app.Configuration);
     var isSqlite = conn.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase);
 
     if (!isSqlite)

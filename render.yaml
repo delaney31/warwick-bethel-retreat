@@ -27,7 +27,9 @@ services:
         value: "false"
       - key: SeedRetreat
         value: "true"
-      - key: ConnectionStrings__DefaultConnection
+      # Prefer DATABASE_URL for Neon (full URI with ?sslmode=require). Render also accepts
+      # ConnectionStrings__DefaultConnection if pasted as a single secret in the dashboard.
+      - key: DATABASE_URL
         sync: false
       - key: Jwt__SigningKey
         generateValue: true
