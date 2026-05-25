@@ -1,34 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ReservationDbStatus } from "@/lib/reservations";
+import { ReservationDbStatus } from "@/lib/reservations/status";
 import { fetchHostReservations, type HostReservation } from "@/lib/admin/api";
+import { filterHostReservations } from "@/lib/admin/filter-reservations";
 import { HOST_STATUS_LABELS, HOST_STATUS_ORDER } from "@/lib/admin/status";
 import { HostReservationCard } from "@/components/admin/host-reservation-card";
-import { formatCurrency } from "@/lib/validation/booking";
-
-function StatTile({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-stone-200/60 bg-white/80 px-5 py-4 shadow-sm">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-stone-400">{label}</p>
-      <p className="mt-2 font-serif text-3xl font-light text-stone-900">{value}</p>
-      {sub && <p className="mt-1 text-xs text-stone-500">{sub}</p>}
-    </div>
-  );
-}
+import { HostDashboardToolbar } from "@/components/admin/host-dashboard-toolbar";
+import { HostStatGrid } from "@/components/admin/host-stat-grid";
 
 export function HostCommandCenter() {
   const [reservations, setReservations] = useState<HostReservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<ReservationDbStatus | "all">("all");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -47,14 +33,19 @@ export function HostCommandCenter() {
     void load();
   }, [load]);
 
+  const filtered = useMemo(
+    () => filterHostReservations(reservations, { query, status: statusFilter }),
+    [reservations, query, statusFilter],
+  );
+
   const grouped = useMemo(() => {
     const map = new Map<ReservationDbStatus, HostReservation[]>();
     for (const s of HOST_STATUS_ORDER) map.set(s, []);
-    for (const r of reservations) {
+    for (const r of filtered) {
       map.get(r.status)?.push(r);
     }
     return map;
-  }, [reservations]);
+  }, [filtered]);
 
   const stats = useMemo(() => {
     const pending = reservations.filter((r) => r.status === ReservationDbStatus.PENDING_REVIEW);
@@ -77,56 +68,79 @@ export function HostCommandCenter() {
     setReservations((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
   };
 
+  const showGrouped = statusFilter === "all";
+
   return (
     <div className="mx-auto max-w-5xl">
-      <header className="mb-10">
+      <header className="mb-8">
         <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-sage-600">
-          Host command center
+          Host dashboard
         </p>
         <h1 className="mt-2 font-serif text-4xl font-light tracking-tight text-stone-900 md:text-5xl">
-          Warwick Bethel Retreat
+          Reservations
         </h1>
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-stone-600">
-          Review guest requests, approve stays, send payment links, and confirm bookings — all
-          from your private hospitality dashboard.
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-stone-600">
+          Review guest requests, approve stays, send Stripe payment links, and confirm bookings —
+          your private boutique hospitality command center.
         </p>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile label="Pending review" value={String(stats.pendingCount)} sub="Needs your decision" />
-        <StatTile
-          label="Awaiting payment"
-          value={String(stats.awaitingCount)}
-          sub={stats.pipeline > 0 ? formatCurrency(stats.pipeline) + " pipeline" : undefined}
+      <HostStatGrid
+        pendingCount={stats.pendingCount}
+        awaitingCount={stats.awaitingCount}
+        confirmedCount={stats.confirmedCount}
+        totalCount={reservations.length}
+        pipeline={stats.pipeline}
+        booked={stats.booked}
+      />
+
+      <div className="mt-8">
+        <HostDashboardToolbar
+          query={query}
+          onQueryChange={setQuery}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+          resultCount={filtered.length}
+          totalCount={reservations.length}
+          onRefresh={() => void load()}
+          refreshing={loading}
         />
-        <StatTile
-          label="Confirmed"
-          value={String(stats.confirmedCount)}
-          sub={stats.booked > 0 ? formatCurrency(stats.booked) + " secured" : undefined}
-        />
-        <StatTile label="All requests" value={String(reservations.length)} />
       </div>
 
       {error && (
-        <p className="mt-8 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <p
+          role="alert"
+          className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+        >
           {error}
         </p>
       )}
 
-      {loading ? (
-        <div className="mt-12 space-y-6">
+      {loading && reservations.length === 0 ? (
+        <div className="mt-10 space-y-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-48 animate-pulse rounded-2xl bg-stone-200/40" />
+            <div key={i} className="h-52 animate-pulse rounded-2xl bg-stone-200/40" />
           ))}
         </div>
-      ) : (
-        <div className="mt-12 space-y-14">
+      ) : filtered.length === 0 ? (
+        <div className="mt-10 rounded-2xl border border-dashed border-stone-300 bg-white/60 px-8 py-16 text-center">
+          <p className="font-serif text-xl font-light text-stone-700">
+            {reservations.length === 0 ? "No reservation requests yet" : "No matches for your filters"}
+          </p>
+          <p className="mt-2 text-sm text-stone-500">
+            {reservations.length === 0
+              ? "When guests submit from the booking page, they appear here from your database."
+              : "Try clearing search or choosing a different status."}
+          </p>
+        </div>
+      ) : showGrouped ? (
+        <div className="mt-10 space-y-14">
           {HOST_STATUS_ORDER.map((status) => {
             const items = grouped.get(status) ?? [];
             if (items.length === 0) return null;
             return (
               <section key={status}>
-                <div className="mb-6 flex items-baseline justify-between gap-4 border-b border-stone-200/60 pb-3">
+                <div className="mb-5 flex items-baseline justify-between gap-4 border-b border-stone-200/60 pb-3">
                   <h2 className="font-serif text-xl font-light text-stone-800">
                     {HOST_STATUS_LABELS[status]}
                   </h2>
@@ -142,14 +156,12 @@ export function HostCommandCenter() {
               </section>
             );
           })}
-          {reservations.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-stone-300 bg-white/50 px-8 py-16 text-center">
-              <p className="font-serif text-xl font-light text-stone-700">No reservation requests yet</p>
-              <p className="mt-2 text-sm text-stone-500">
-                When guests submit from the booking page, they will appear here grouped by status.
-              </p>
-            </div>
-          )}
+        </div>
+      ) : (
+        <div className="mt-10 space-y-5">
+          {filtered.map((r) => (
+            <HostReservationCard key={r.id} reservation={r} onUpdated={handleUpdated} />
+          ))}
         </div>
       )}
     </div>

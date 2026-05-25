@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "We could not save your request right now. Please try again shortly, or contact us if this continues.",
+          "We couldn't submit your request. Please check your details and try again.",
       },
       { status: 500 },
     );

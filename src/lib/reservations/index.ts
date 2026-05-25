@@ -1,21 +1,28 @@
+import "server-only";
+
 import { Prisma, ReservationStatus as DbReservationStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
+import { isDatabaseConfigured, isProductionRuntime, requireDatabase } from "./db";
+import {
+  calculateReservationTotal,
+  checkDateOverlap,
+  DEFAULT_BASE_RATE,
+  DEFAULT_EXTRA_GUEST_NIGHTLY,
+  getNights,
+  GUESTS_INCLUDED,
+  type ReservationPricing,
+} from "./helpers";
 
-export { DbReservationStatus as ReservationDbStatus };
-
-/** Nightly base rate (includes up to 2 guests). */
-export const DEFAULT_BASE_RATE = 150;
-/** Per-night surcharge per guest above 2. */
-export const DEFAULT_EXTRA_GUEST_NIGHTLY = 25;
-export const GUESTS_INCLUDED = 2;
-
-export interface ReservationPricing {
-  nights: number;
-  baseRate: number;
-  extraGuestFee: number;
-  totalAmount: number;
-  extraGuests: number;
-}
+export { ReservationDbStatus } from "./status";
+export {
+  calculateReservationTotal,
+  checkDateOverlap,
+  DEFAULT_BASE_RATE,
+  DEFAULT_EXTRA_GUEST_NIGHTLY,
+  getNights,
+  GUESTS_INCLUDED,
+  type ReservationPricing,
+};
 
 export interface CreateReservationInput {
   guestName: string;
@@ -44,8 +51,17 @@ export interface MonthAvailability {
     end: string;
     reason: string;
   }>;
-  /** Dates that block new PAID_CONFIRMED bookings (paid stays + manual blocks). */
+  /** Dates that block new PAID_CONFIRMED bookings (paid stays + manual blocks only). */
   blockedRanges: DateRange[];
+}
+
+export interface SerializedCalendarBlock {
+  id: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 function parseDateOnly(iso: string): Date {
@@ -65,54 +81,6 @@ function decimalToNumber(d: Prisma.Decimal): number {
   return d.toNumber();
 }
 
-/** Inclusive calendar nights between check-in and check-out (check-out is departure day). */
-export function getNights(checkIn: string, checkOut: string): number {
-  const start = parseDateOnly(checkIn);
-  const end = parseDateOnly(checkOut);
-  const ms = end.getTime() - start.getTime();
-  return Math.max(0, Math.floor(ms / 86400000));
-}
-
-/**
- * True when two half-open stay ranges [start, end) overlap.
- */
-export function checkDateOverlap(
-  aStart: string,
-  aEnd: string,
-  bStart: string,
-  bEnd: string,
-): boolean {
-  const a0 = parseDateOnly(aStart).getTime();
-  const a1 = parseDateOnly(aEnd).getTime();
-  const b0 = parseDateOnly(bStart).getTime();
-  const b1 = parseDateOnly(bEnd).getTime();
-  return a0 < b1 && b0 < a1;
-}
-
-export function calculateReservationTotal(
-  guestCount: number,
-  checkIn: string,
-  checkOut: string,
-  baseRatePerNight: number = DEFAULT_BASE_RATE,
-  extraGuestNightly: number = DEFAULT_EXTRA_GUEST_NIGHTLY,
-): ReservationPricing | null {
-  const nights = getNights(checkIn, checkOut);
-  if (nights <= 0) return null;
-
-  const extraGuests = Math.max(0, guestCount - GUESTS_INCLUDED);
-  const basePortion = baseRatePerNight * nights;
-  const extraGuestFee = extraGuests * extraGuestNightly * nights;
-  const totalAmount = basePortion + extraGuestFee;
-
-  return {
-    nights,
-    baseRate: baseRatePerNight,
-    extraGuestFee,
-    totalAmount,
-    extraGuests,
-  };
-}
-
 function monthBounds(year: number, month: number): { from: Date; to: Date; fromStr: string; toStr: string } {
   const from = new Date(Date.UTC(year, month - 1, 1));
   const to = new Date(Date.UTC(year, month, 0));
@@ -124,15 +92,36 @@ function monthBounds(year: number, month: number): { from: Date; to: Date; fromS
   };
 }
 
-/** Ranges that block the calendar for guests (paid stays + manual blocks only). */
+function serializeCalendarBlock(row: {
+  id: string;
+  startDate: Date;
+  endDate: Date;
+  reason: string;
+  createdAt: Date;
+  updatedAt: Date;
+}): SerializedCalendarBlock {
+  return {
+    id: row.id,
+    startDate: toDateOnlyString(row.startDate),
+    endDate: toDateOnlyString(row.endDate),
+    reason: row.reason,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+/** Ranges that block bookings: PAID_CONFIRMED only + manual CalendarBlock (not pending/unpaid). */
 async function getBlockingRanges(
   rangeStart: string,
   rangeEnd: string,
   excludeReservationId?: string,
 ): Promise<DateRange[]> {
+  requireDatabase();
+
   const start = parseDateOnly(rangeStart);
   const end = parseDateOnly(rangeEnd);
 
+  try {
   const [paid, blocks] = await Promise.all([
     prisma.reservation.findMany({
       where: {
@@ -160,6 +149,10 @@ async function getBlockingRanges(
     ranges.push({ start: toDateOnlyString(b.startDate), end: toDateOnlyString(b.endDate) });
   }
   return ranges;
+  } catch (err) {
+    console.error("[reservations] blocking range query failed", err);
+    throw err;
+  }
 }
 
 export async function hasBlockingOverlap(
@@ -167,8 +160,14 @@ export async function hasBlockingOverlap(
   checkOut: string,
   excludeReservationId?: string,
 ): Promise<boolean> {
-  const ranges = await getBlockingRanges(checkIn, checkOut, excludeReservationId);
-  return ranges.some((r) => checkDateOverlap(checkIn, checkOut, r.start, r.end));
+  if (!isDatabaseConfigured()) return false;
+  try {
+    const ranges = await getBlockingRanges(checkIn, checkOut, excludeReservationId);
+    return ranges.some((r) => checkDateOverlap(checkIn, checkOut, r.start, r.end));
+  } catch (err) {
+    console.error("[reservations] blocking overlap check failed", err);
+    return false;
+  }
 }
 
 export async function checkAvailabilityForStay(
@@ -178,6 +177,9 @@ export async function checkAvailabilityForStay(
   const nights = getNights(checkIn, checkOut);
   if (nights <= 0) {
     return { isAvailable: false, reason: "Check-out must be after check-in." };
+  }
+  if (!isDatabaseConfigured()) {
+    return { isAvailable: true };
   }
   const overlap = await hasBlockingOverlap(checkIn, checkOut);
   if (overlap) {
@@ -189,31 +191,43 @@ export async function checkAvailabilityForStay(
   return { isAvailable: true };
 }
 
+/** Guest request — always PENDING_REVIEW; may overlap other pending/approved-unpaid stays. */
 export async function createReservationRequest(input: CreateReservationInput) {
   const pricing = calculateReservationTotal(input.guestCount, input.checkIn, input.checkOut);
   if (!pricing) {
     throw new Error("Invalid date range.");
   }
 
-  return prisma.reservation.create({
-    data: {
-      guestName: input.guestName.trim(),
-      email: input.email.trim(),
-      phone: input.phone.trim(),
-      guestCount: input.guestCount,
-      checkIn: parseDateOnly(input.checkIn),
-      checkOut: parseDateOnly(input.checkOut),
-      nights: pricing.nights,
-      baseRate: toDecimal(pricing.baseRate),
-      extraGuestFee: toDecimal(pricing.extraGuestFee),
-      totalAmount: toDecimal(pricing.totalAmount),
-      status: DbReservationStatus.PENDING_REVIEW,
-      notes: input.notes?.trim() || null,
-    },
-  });
+  if (isDatabaseConfigured()) {
+    return prisma.reservation.create({
+      data: {
+        guestName: input.guestName.trim(),
+        email: input.email.trim(),
+        phone: input.phone.trim(),
+        guestCount: input.guestCount,
+        checkIn: parseDateOnly(input.checkIn),
+        checkOut: parseDateOnly(input.checkOut),
+        nights: pricing.nights,
+        baseRate: toDecimal(pricing.baseRate),
+        extraGuestFee: toDecimal(pricing.extraGuestFee),
+        totalAmount: toDecimal(pricing.totalAmount),
+        status: DbReservationStatus.PENDING_REVIEW,
+        notes: input.notes?.trim() || null,
+      },
+    });
+  }
+
+  if (isProductionRuntime()) {
+    requireDatabase();
+  }
+
+  console.warn("[reservations] DATABASE_URL not set — dev fallback JSON store");
+  const { fallbackCreateReservation } = await import("./fallback-store");
+  return fallbackCreateReservation(input, pricing);
 }
 
 export async function getReservations(status?: DbReservationStatus) {
+  requireDatabase();
   return prisma.reservation.findMany({
     where: status ? { status } : undefined,
     orderBy: { createdAt: "desc" },
@@ -221,10 +235,12 @@ export async function getReservations(status?: DbReservationStatus) {
 }
 
 export async function getReservationById(id: string) {
+  requireDatabase();
   return prisma.reservation.findUnique({ where: { id } });
 }
 
 export async function setReservationCheckoutSession(id: string, sessionId: string) {
+  requireDatabase();
   return prisma.reservation.update({
     where: { id },
     data: { stripeCheckoutSessionId: sessionId },
@@ -247,6 +263,10 @@ const ALLOWED_TRANSITIONS: Record<DbReservationStatus, DbReservationStatus[]> = 
   [DbReservationStatus.CANCELLED]: [],
 };
 
+/**
+ * Status workflow with overlap guard when marking PAID_CONFIRMED.
+ * APPROVED_AWAITING_PAYMENT does not block the calendar until paid.
+ */
 export async function updateReservationStatus(
   id: string,
   status: DbReservationStatus,
@@ -255,6 +275,8 @@ export async function updateReservationStatus(
     stripePaymentIntentId?: string | null;
   },
 ) {
+  requireDatabase();
+
   const existing = await prisma.reservation.findUnique({ where: { id } });
   if (!existing) {
     throw new Error("Reservation not found.");
@@ -294,6 +316,8 @@ export async function getAvailabilityForMonth(
   year: number,
   month: number,
 ): Promise<MonthAvailability> {
+  requireDatabase();
+
   const { from, to, fromStr, toStr } = monthBounds(year, month);
   const rangeEndExclusive = new Date(to.getTime() + 86400000);
 
@@ -344,41 +368,127 @@ export async function getAvailabilityForMonth(
   };
 }
 
-export interface PublicCalendarPayload {
-  bookedRanges: DateRange[];
-  pendingRanges: DateRange[];
-  blocks: Array<{
-    id: string;
-    startDateUtc: string;
-    endDateUtc: string;
-    reason: string;
-  }>;
+export async function listCalendarBlocks(): Promise<SerializedCalendarBlock[]> {
+  requireDatabase();
+  const rows = await prisma.calendarBlock.findMany({ orderBy: { startDate: "asc" } });
+  return rows.map(serializeCalendarBlock);
 }
 
-/** Public availability calendar — paid stays, pending requests, and manual blocks from Postgres. */
+export async function getCalendarBlocksInRange(
+  from: string,
+  to: string,
+): Promise<SerializedCalendarBlock[]> {
+  requireDatabase();
+  const start = parseDateOnly(from);
+  const end = parseDateOnly(to);
+  const rows = await prisma.calendarBlock.findMany({
+    where: {
+      startDate: { lt: end },
+      endDate: { gt: start },
+    },
+    orderBy: { startDate: "asc" },
+  });
+  return rows.map(serializeCalendarBlock);
+}
+
+export async function createCalendarBlock(input: {
+  startDate: string;
+  endDate: string;
+  reason: string;
+}): Promise<SerializedCalendarBlock> {
+  requireDatabase();
+
+  const start = parseDateOnly(input.startDate);
+  const end = parseDateOnly(input.endDate);
+  if (end.getTime() <= start.getTime()) {
+    throw new Error("endDate must be after startDate.");
+  }
+
+  const overlap = await prisma.calendarBlock.findFirst({
+    where: {
+      startDate: { lt: end },
+      endDate: { gt: start },
+    },
+  });
+  if (overlap) {
+    throw new Error("Calendar block overlaps an existing block.");
+  }
+
+  const row = await prisma.calendarBlock.create({
+    data: {
+      startDate: start,
+      endDate: end,
+      reason: input.reason.trim(),
+    },
+  });
+  return serializeCalendarBlock(row);
+}
+
+export async function deleteCalendarBlock(id: string): Promise<void> {
+  requireDatabase();
+  try {
+    await prisma.calendarBlock.delete({ where: { id } });
+  } catch {
+    throw new Error("Calendar block not found.");
+  }
+}
+
+export interface PublicCalendarBlock {
+  id: string;
+  startDateUtc: string;
+  endDateUtc: string;
+  reason: string;
+}
+
+export interface PublicCalendarPayload {
+  configured: boolean;
+  bookedRanges: DateRange[];
+  pendingReviewRanges: DateRange[];
+  approvedAwaitingRanges: DateRange[];
+  blocks: PublicCalendarBlock[];
+}
+
+/** Public calendar from PostgreSQL — paid stays block; pending/approved are visible but non-blocking. */
 export async function getCalendarApiPayload(from: string, to: string): Promise<PublicCalendarPayload> {
+  if (!isDatabaseConfigured()) {
+    return {
+      configured: false,
+      bookedRanges: [],
+      pendingReviewRanges: [],
+      approvedAwaitingRanges: [],
+      blocks: [],
+    };
+  }
+
+  requireDatabase();
+
   const start = parseDateOnly(from);
   const end = parseDateOnly(to);
 
-  const [paid, pending, blocks] = await Promise.all([
+  const rangeFilter = {
+    checkIn: { lt: end },
+    checkOut: { gt: start },
+  };
+
+  const [paid, pendingReview, approvedAwaiting, blocks] = await Promise.all([
     prisma.reservation.findMany({
       where: {
         status: DbReservationStatus.PAID_CONFIRMED,
-        checkIn: { lt: end },
-        checkOut: { gt: start },
+        ...rangeFilter,
       },
       select: { checkIn: true, checkOut: true },
     }),
     prisma.reservation.findMany({
       where: {
-        status: {
-          in: [
-            DbReservationStatus.PENDING_REVIEW,
-            DbReservationStatus.APPROVED_AWAITING_PAYMENT,
-          ],
-        },
-        checkIn: { lt: end },
-        checkOut: { gt: start },
+        status: DbReservationStatus.PENDING_REVIEW,
+        ...rangeFilter,
+      },
+      select: { checkIn: true, checkOut: true },
+    }),
+    prisma.reservation.findMany({
+      where: {
+        status: DbReservationStatus.APPROVED_AWAITING_PAYMENT,
+        ...rangeFilter,
       },
       select: { checkIn: true, checkOut: true },
     }),
@@ -397,8 +507,10 @@ export async function getCalendarApiPayload(from: string, to: string): Promise<P
   });
 
   return {
+    configured: true,
     bookedRanges: paid.map((r) => toRange(r.checkIn, r.checkOut)),
-    pendingRanges: pending.map((r) => toRange(r.checkIn, r.checkOut)),
+    pendingReviewRanges: pendingReview.map((r) => toRange(r.checkIn, r.checkOut)),
+    approvedAwaitingRanges: approvedAwaiting.map((r) => toRange(r.checkIn, r.checkOut)),
     blocks: blocks.map((b) => ({
       id: b.id,
       startDateUtc: `${toDateOnlyString(b.startDate)}T00:00:00.000Z`,
@@ -408,25 +520,69 @@ export async function getCalendarApiPayload(from: string, to: string): Promise<P
   };
 }
 
-export function serializeReservation(r: Awaited<ReturnType<typeof getReservationById>>) {
+type PersistedReservationRow = {
+  id: string;
+  guestName: string;
+  email: string;
+  phone: string;
+  guestCount: number;
+  checkIn: Date | string;
+  checkOut: Date | string;
+  nights: number;
+  baseRate: Prisma.Decimal | number;
+  extraGuestFee: Prisma.Decimal | number;
+  totalAmount: Prisma.Decimal | number;
+  status: DbReservationStatus;
+  notes: string | null;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  stripeCheckoutSessionId?: string | null;
+  stripePaymentIntentId?: string | null;
+};
+
+export function serializeReservation(r: PersistedReservationRow | null) {
   if (!r) return null;
+
+  const checkIn =
+    r.checkIn instanceof Date ? toDateOnlyString(r.checkIn) : String(r.checkIn).slice(0, 10);
+  const checkOut =
+    r.checkOut instanceof Date ? toDateOnlyString(r.checkOut) : String(r.checkOut).slice(0, 10);
+  const baseRate =
+    typeof r.baseRate === "object" && "toNumber" in (r.baseRate as object)
+      ? decimalToNumber(r.baseRate as Prisma.Decimal)
+      : Number(r.baseRate);
+  const extraGuestFee =
+    typeof r.extraGuestFee === "object" && "toNumber" in (r.extraGuestFee as object)
+      ? decimalToNumber(r.extraGuestFee as Prisma.Decimal)
+      : Number(r.extraGuestFee);
+  const totalAmount =
+    typeof r.totalAmount === "object" && "toNumber" in (r.totalAmount as object)
+      ? decimalToNumber(r.totalAmount as Prisma.Decimal)
+      : Number(r.totalAmount);
+  const createdAt =
+    r.createdAt instanceof Date ? r.createdAt.toISOString() : String(r.createdAt);
+  const updatedAt =
+    r.updatedAt instanceof Date ? r.updatedAt.toISOString() : String(r.updatedAt);
+
   return {
     id: r.id,
     guestName: r.guestName,
     email: r.email,
     phone: r.phone,
     guestCount: r.guestCount,
-    checkIn: toDateOnlyString(r.checkIn),
-    checkOut: toDateOnlyString(r.checkOut),
+    checkIn,
+    checkOut,
     nights: r.nights,
-    baseRate: decimalToNumber(r.baseRate),
-    extraGuestFee: decimalToNumber(r.extraGuestFee),
-    totalAmount: decimalToNumber(r.totalAmount),
+    baseRate,
+    extraGuestFee,
+    totalAmount,
     status: r.status,
     notes: r.notes,
-    stripeCheckoutSessionId: r.stripeCheckoutSessionId,
-    stripePaymentIntentId: r.stripePaymentIntentId,
-    createdAt: r.createdAt.toISOString(),
-    updatedAt: r.updatedAt.toISOString(),
+    stripeCheckoutSessionId:
+      "stripeCheckoutSessionId" in r ? r.stripeCheckoutSessionId : null,
+    stripePaymentIntentId:
+      "stripePaymentIntentId" in r ? r.stripePaymentIntentId : null,
+    createdAt,
+    updatedAt,
   };
 }

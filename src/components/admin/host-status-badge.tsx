@@ -1,4 +1,4 @@
-import { ReservationDbStatus } from "@/lib/reservations";
+import { ReservationDbStatus } from "@/lib/reservations/status";
 import { HOST_STATUS_LABELS, HOST_STATUS_STYLES } from "@/lib/admin/status";
 import { cn } from "@/lib/utils/cn";
 

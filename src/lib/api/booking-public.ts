@@ -32,15 +32,20 @@ export interface CalendarDayRange {
 }
 
 export interface CalendarBlock {
+  id: string;
   startDateUtc: string;
   endDateUtc: string;
+  reason: string;
 }
 
 export interface BookingCalendarData {
+  configured: boolean;
   /** PAID_CONFIRMED — not selectable */
   bookedRanges: CalendarDayRange[];
-  /** PENDING_REVIEW / APPROVED_AWAITING_PAYMENT — visible, selectable */
-  pendingRanges: CalendarDayRange[];
+  /** PENDING_REVIEW — visible, selectable */
+  pendingReviewRanges: CalendarDayRange[];
+  /** APPROVED_AWAITING_PAYMENT — visible, selectable until paid */
+  approvedAwaitingRanges: CalendarDayRange[];
   blocks: CalendarBlock[];
 }
 
@@ -97,7 +102,7 @@ export async function fetchBookingCalendar(
   to: string,
 ): Promise<BookingCalendarData | BookingApiError> {
   const params = new URLSearchParams({ from, to });
-  const res = await fetch(`/api/booking/calendar?${params}`);
+  const res = await fetch(`/api/booking/calendar?${params}`, { cache: "no-store" });
   return parseJson<BookingCalendarData>(res);
 }
 

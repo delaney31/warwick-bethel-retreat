@@ -1,4 +1,4 @@
-import type { ReservationDbStatus } from "@/lib/reservations";
+import type { ReservationDbStatus } from "@/lib/reservations/status";
 
 export interface GuestReservationView {
   id: string;

@@ -3,6 +3,7 @@ import { constructStripeEvent, handleCheckoutSessionCompleted } from "@/lib/stri
 
 export const runtime = "nodejs";
 
+/** Stripe requires the raw body for signature verification — do not parse as JSON first. */
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
   if (!signature) {
@@ -15,14 +16,17 @@ export async function POST(request: Request) {
     event = constructStripeEvent(payload, signature);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Webhook verification failed.";
+    console.error("[stripe webhook] signature verification failed:", message);
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
   try {
     switch (event.type) {
-      case "checkout.session.completed": {
+      case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded": {
         const session = event.data.object;
-        await handleCheckoutSessionCompleted(session);
+        const result = await handleCheckoutSessionCompleted(session);
+        console.info("[stripe webhook]", event.type, result);
         break;
       }
       default:

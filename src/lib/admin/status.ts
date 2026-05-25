@@ -1,4 +1,4 @@
-import { ReservationDbStatus } from "@/lib/reservations";
+import { ReservationDbStatus } from "@/lib/reservations/status";
 
 export const HOST_STATUS_LABELS: Record<ReservationDbStatus, string> = {
   [ReservationDbStatus.PENDING_REVIEW]: "Pending Review",

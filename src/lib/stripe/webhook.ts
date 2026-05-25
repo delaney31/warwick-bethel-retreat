@@ -15,6 +15,10 @@ function paymentIntentId(
   return paymentIntent.id ?? null;
 }
 
+/**
+ * Marks reservation PAID_CONFIRMED after Stripe Checkout.
+ * Verifies amount from database; overlap check runs in updateReservationStatus.
+ */
 export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
   const reservationId =
     session.metadata?.reservationId ?? session.client_reference_id ?? null;
@@ -40,7 +44,7 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
   }
 
   if (session.payment_status !== "paid") {
-    throw new Error(`Checkout session ${session.id} is not paid.`);
+    throw new Error(`Checkout session ${session.id} is not paid (status: ${session.payment_status}).`);
   }
 
   const piId = paymentIntentId(session.payment_intent);

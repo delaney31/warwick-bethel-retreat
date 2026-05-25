@@ -1,4 +1,5 @@
-import { ReservationDbStatus, getReservationById, serializeReservation } from "./index";
+import { ReservationDbStatus } from "./status";
+import { getReservationById, serializeReservation } from "./index";
 
 export interface GuestReservationPaymentView {
   id: string;
@@ -38,7 +39,7 @@ export async function getGuestReservationPaymentView(
     totalAmount: r.totalAmount,
     status: r.status,
     notes: r.notes,
-    stripeCheckoutSessionId: r.stripeCheckoutSessionId,
+    stripeCheckoutSessionId: r.stripeCheckoutSessionId ?? null,
     canPay: r.status === ReservationDbStatus.APPROVED_AWAITING_PAYMENT,
     isPaid: r.status === ReservationDbStatus.PAID_CONFIRMED,
     isPendingReview: r.status === ReservationDbStatus.PENDING_REVIEW,

@@ -25,6 +25,9 @@ api/**/obj/
 api/**/*.db
 api/**/*.db-*
 
+# local fallback reservation store (when DATABASE_URL unset)
+.data/
+
 # misc
 .DS_Store
 *.log

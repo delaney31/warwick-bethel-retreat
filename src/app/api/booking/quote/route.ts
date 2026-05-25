@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { computeQuote, parseBookingBody } from "@/lib/server/booking";
+import { computeStayQuote, parseQuoteBody } from "@/lib/server/booking";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const payload = parseBookingBody(body);
-    if ("error" in payload) {
-      return NextResponse.json({ error: payload.error }, { status: 400 });
+    const parsed = parseQuoteBody(body);
+    if ("error" in parsed) {
+      return NextResponse.json({ error: parsed.error }, { status: 400 });
     }
 
-    const result = computeQuote(payload);
+    const result = computeStayQuote(parsed.checkIn, parsed.checkOut, parsed.guestCount);
     if ("error" in result) {
       return NextResponse.json(
         { error: result.error, fields: result.fields },

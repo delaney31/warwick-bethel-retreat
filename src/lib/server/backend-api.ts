@@ -17,10 +17,10 @@ export function getServerApiBaseUrl(): string {
     if (base) return base;
   }
   if (!isProd()) {
-    return normalizeToApiBase("http://localhost:5002");
+    return normalizeToApiBase("http://localhost:5001");
   }
   throw new Error(
-    "Reservation API is not configured. Set INTERNAL_API_URL or NEXT_PUBLIC_API_BASE_URL to your Render API URL.",
+    "Legacy API is not configured. Set INTERNAL_API_URL or NEXT_PUBLIC_API_BASE_URL only if using the ASP.NET admin API.",
   );
 }
 

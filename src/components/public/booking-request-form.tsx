@@ -38,9 +38,9 @@ const EMPTY: BookingRequestFormData = {
 type AvailabilityState =
   | { status: "idle" }
   | { status: "loading" }
-  | { status: "available" }
+  | { status: "available"; message?: string }
   | { status: "unavailable"; reason: string }
-  | { status: "error"; message: string; softFail?: boolean };
+  | { status: "error"; message: string };
 
 function BookingRequestFormInner() {
   const searchParams = useSearchParams();
@@ -87,10 +87,17 @@ function BookingRequestFormInner() {
       fetchBookingAvailability({ checkIn: form.checkIn, checkOut: form.checkOut })
         .then((r) => {
           if (isBookingApiError(r)) {
+            if ("softFail" in r && (r as { softFail?: boolean }).softFail) {
+              setAvailability({
+                status: "available",
+                message:
+                  "Calendar could not be checked right now — you may still submit your request.",
+              });
+              return;
+            }
             setAvailability({
               status: "error",
               message: r.error,
-              softFail: "softFail" in r && Boolean((r as { softFail?: boolean }).softFail),
             });
             return;
           }
@@ -103,10 +110,9 @@ function BookingRequestFormInner() {
         })
         .catch(() =>
           setAvailability({
-            status: "error",
+            status: "available",
             message:
-              "We could not verify dates right now. You may still submit — our host will confirm availability.",
-            softFail: true,
+              "Calendar could not be checked right now — you may still submit your request.",
           }),
         );
     }, 400);
@@ -183,11 +189,11 @@ function BookingRequestFormInner() {
       setSuccess({
         ...result,
         message:
-          "Request received. We'll review your stay and send payment instructions if approved.",
+          "Your request has been received. We'll review your stay and follow up with payment instructions if approved.",
       });
     } catch {
       setSubmitError(
-        "We could not submit your request right now. Please try again in a moment.",
+        "We couldn't submit your request. Please check your details and try again.",
       );
     } finally {
       setSubmitting(false);
@@ -313,7 +319,7 @@ function BookingRequestFormInner() {
           className={cn("mt-8 w-full", submitting && "opacity-70")}
           disabled={!canSubmit}
         >
-          {submitting ? "Sending request…" : "Submit reservation request"}
+          {submitting ? "Submitting your request…" : "Submit reservation request"}
         </Button>
 
         <p className="mt-4 text-center text-xs text-stone-400">

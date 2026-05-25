@@ -1,11 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdminRequest, AdminAuthError } from "@/lib/admin/auth";
 import { getReservationById } from "@/lib/reservations";
-import { retrieveCheckoutUrl } from "@/lib/stripe/checkout";
-
-function appOrigin(): string {
-  return (process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000").replace(/\/$/, "");
-}
+import { resolveGuestPaymentLinks } from "@/lib/stripe/payment-links";
 
 export async function GET(
   request: NextRequest,
@@ -19,18 +15,13 @@ export async function GET(
       return NextResponse.json({ error: "Reservation not found." }, { status: 404 });
     }
 
-    let checkoutUrl: string | null = null;
-    if (row.stripeCheckoutSessionId) {
-      checkoutUrl = await retrieveCheckoutUrl(row.stripeCheckoutSessionId);
-    }
-
-    if (!checkoutUrl) {
-      checkoutUrl = `${appOrigin()}/reservations/${id}/payment`;
-    }
-
-    // Prefer guest payment hub; Stripe URL used when session is open
-
-    return NextResponse.json({ checkoutUrl });
+    const links = await resolveGuestPaymentLinks(id);
+    return NextResponse.json({
+      guestPaymentUrl: links.guestPaymentUrl,
+      stripeCheckoutUrl: links.stripeCheckoutUrl,
+      /** Prefer guest hub for email/SMS; Stripe URL for direct pay. */
+      checkoutUrl: links.stripeCheckoutUrl ?? links.guestPaymentUrl,
+    });
   } catch (err) {
     if (err instanceof AdminAuthError) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

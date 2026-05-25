@@ -7,7 +7,7 @@ import { adminLogout } from "@/lib/admin/api";
 import { cn } from "@/lib/utils/cn";
 
 const NAV = [
-  { href: "/admin", label: "Reservations", icon: LayoutDashboard },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/calendar", label: "Calendar", icon: CalendarDays },
 ];
 

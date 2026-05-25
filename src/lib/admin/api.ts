@@ -1,4 +1,4 @@
-import type { ReservationDbStatus } from "@/lib/reservations";
+import type { ReservationDbStatus } from "@/lib/reservations/status";
 
 export interface HostReservation {
   id: string;
@@ -96,6 +96,12 @@ export async function createHostCheckoutSession(id: string): Promise<CheckoutSes
   });
 }
 
-export async function fetchHostPaymentLink(id: string): Promise<{ checkoutUrl: string }> {
-  return adminFetch<{ checkoutUrl: string }>(`/api/admin/reservations/${id}/payment-link`);
+export interface HostPaymentLinks {
+  guestPaymentUrl: string;
+  stripeCheckoutUrl: string | null;
+  checkoutUrl: string;
+}
+
+export async function fetchHostPaymentLinks(id: string): Promise<HostPaymentLinks> {
+  return adminFetch<HostPaymentLinks>(`/api/admin/reservations/${id}/payment-link`);
 }

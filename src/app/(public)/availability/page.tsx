@@ -4,25 +4,25 @@ import { AvailabilityCalendar } from "@/components/public/availability-calendar"
 export const metadata: Metadata = {
   title: "Availability",
   description:
-    "See available, pending, booked, and blocked dates — select your stay and request reservation.",
+    "Live availability from our reservation database — see open, pending, approved, booked, and blocked dates.",
 };
 
 export default function AvailabilityPage() {
   return (
-    <div className="bg-gradient-to-b from-stone-100 via-stone-50 to-stone-50 pt-28 pb-24">
+    <div className="bg-gradient-to-b from-stone-100 via-stone-50 to-sage-50/20 pt-28 pb-24">
       <div className="mx-auto max-w-4xl px-4 md:px-8">
         <p className="text-center text-[11px] font-semibold uppercase tracking-[0.35em] text-sage-600">
           Plan your retreat
         </p>
-        <h1 className="mt-3 text-center font-serif text-4xl font-light text-stone-900 md:text-5xl">
+        <h1 className="mt-3 text-center font-serif text-4xl font-light tracking-tight text-stone-900 md:text-5xl">
           Availability
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-center text-stone-600">
-          Live calendar from our reservation system — confirmed stays and host blocks are protected.
-          Pending requests are shown so you know what is in review. Select open dates and continue to
-          your reservation request.
+        <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-stone-600">
+          Every date reflects live data from our reservation system. Confirmed paid stays and host
+          blocks are protected — your request cannot cross those nights. Select check-in and
+          check-out, then continue to your reservation request with dates pre-filled.
         </p>
-        <div className="mt-12">
+        <div className="mt-10 sm:mt-12">
           <AvailabilityCalendar />
         </div>
       </div>

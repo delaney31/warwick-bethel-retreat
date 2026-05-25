@@ -6,15 +6,73 @@ export interface FieldError {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+function parseIsoDateOnly(iso: string): Date | null {
+  if (!ISO_DATE_RE.test(iso)) return null;
+  const [y, m, d] = iso.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) {
+    return null;
+  }
+  return dt;
+}
+
 export function calculateNights(checkIn: string, checkOut: string): number {
-  const start = new Date(checkIn);
-  const end = new Date(checkOut);
+  const start = parseIsoDateOnly(checkIn);
+  const end = parseIsoDateOnly(checkOut);
+  if (!start || !end) return 0;
   return Math.max(0, Math.floor((end.getTime() - start.getTime()) / 86400000));
+}
+
+export function validateStayDates(
+  checkIn: string,
+  checkOut: string,
+): FieldError[] {
+  const errors: FieldError[] = [];
+  if (!checkIn) {
+    errors.push({ field: "checkIn", message: "Check-in is required." });
+  } else if (!parseIsoDateOnly(checkIn)) {
+    errors.push({ field: "checkIn", message: "Check-in must be a valid date (YYYY-MM-DD)." });
+  }
+  if (!checkOut) {
+    errors.push({ field: "checkOut", message: "Check-out is required." });
+  } else if (!parseIsoDateOnly(checkOut)) {
+    errors.push({ field: "checkOut", message: "Check-out must be a valid date (YYYY-MM-DD)." });
+  }
+  if (errors.length) return errors;
+
+  const nights = calculateNights(checkIn, checkOut);
+  if (nights <= 0) {
+    errors.push({
+      field: "checkOut",
+      message: "Check-out must be after check-in (at least one night).",
+    });
+  }
+  if (checkIn < todayISO()) {
+    errors.push({ field: "checkIn", message: "Check-in cannot be in the past." });
+  }
+  return errors;
+}
+
+/** Quote sidebar — dates and guest count only (no contact fields required yet). */
+export function validateQuoteInput(
+  checkIn: string,
+  checkOut: string,
+  guestCount: number,
+  maxGuests: number,
+): FieldError[] {
+  const errors = validateStayDates(checkIn, checkOut);
+  if (!Number.isFinite(guestCount) || guestCount < 1) {
+    errors.push({ field: "guestCount", message: "Guest count is required." });
+  } else if (guestCount > maxGuests) {
+    errors.push({ field: "guestCount", message: `Maximum ${maxGuests} guests.` });
+  }
+  return errors;
 }
 
 export function calculateRetreatPricing(guestCount: number, nights: number) {
@@ -48,12 +106,9 @@ export function validateBookingForm(
       message: "A valid phone number is required (at least 10 digits).",
     });
   }
-  if (!data.checkIn) errors.push({ field: "checkIn", message: "Check-in is required." });
-  if (!data.checkOut) errors.push({ field: "checkOut", message: "Check-out is required." });
-  if (data.checkIn && data.checkOut) {
-    const nights = calculateNights(data.checkIn, data.checkOut);
-    if (nights <= 0) errors.push({ field: "checkOut", message: "Check-out must be after check-in." });
-    if (data.checkIn < todayISO()) errors.push({ field: "checkIn", message: "Check-in cannot be in the past." });
+  errors.push(...validateStayDates(data.checkIn, data.checkOut));
+  if (data.guestNotes.length > 2000) {
+    errors.push({ field: "guestNotes", message: "Notes must be 2000 characters or fewer." });
   }
   const guests = parseInt(data.guestCount, 10);
   if (!data.guestCount || isNaN(guests) || guests < 1) {

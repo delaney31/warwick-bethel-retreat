@@ -1,6 +1,6 @@
 import { MAX_GUESTS } from "@/lib/constants";
 import type { FieldError } from "@/lib/validation/booking";
-import { validateBookingForm } from "@/lib/validation/booking";
+import { validateBookingForm, validateQuoteInput } from "@/lib/validation/booking";
 import {
   calculateReservationTotal,
   checkAvailabilityForStay,
@@ -86,13 +86,34 @@ export function computeQuote(payload: BookingPayload): QuoteResult | { error: st
   if (fieldErrors.length) {
     return { error: "Please fix the highlighted fields.", fields: fieldErrors };
   }
-  const pricing = calculateReservationTotal(payload.guestCount, payload.checkIn, payload.checkOut);
+  return computeStayQuote(payload.checkIn, payload.checkOut, payload.guestCount);
+}
+
+/** Server-side estimate from stay dates only — used by /api/booking/quote before contact fields are filled. */
+export function computeStayQuote(
+  checkIn: string,
+  checkOut: string,
+  guestCount: number,
+): QuoteResult | { error: string; fields?: FieldError[] } {
+  const fieldErrors = validateQuoteInput(checkIn, checkOut, guestCount, MAX_GUESTS);
+  if (fieldErrors.length) {
+    return { error: "Please choose valid dates and guest count.", fields: fieldErrors };
+  }
+  const pricing = calculateReservationTotal(guestCount, checkIn, checkOut);
   if (!pricing) {
-    return { error: "Check-out must be after check-in.", fields: [{ field: "checkOut", message: "Check-out must be after check-in." }] };
+    return {
+      error: "Check-out must be after check-in (at least one night).",
+      fields: [
+        {
+          field: "checkOut",
+          message: "Check-out must be after check-in (at least one night).",
+        },
+      ],
+    };
   }
   return {
     nights: pricing.nights,
-    guestCount: payload.guestCount,
+    guestCount,
     baseRatePerNight: pricing.baseRate,
     baseStayTotal: pricing.baseRate * pricing.nights,
     extraGuests: pricing.extraGuests,
@@ -101,13 +122,35 @@ export function computeQuote(payload: BookingPayload): QuoteResult | { error: st
   };
 }
 
+export function parseQuoteBody(body: unknown): { checkIn: string; checkOut: string; guestCount: number } | { error: string } {
+  if (!body || typeof body !== "object") {
+    return { error: "Invalid request body." };
+  }
+  const b = body as Record<string, unknown>;
+  const guestCount =
+    typeof b.guestCount === "number" ? b.guestCount : parseInt(String(b.guestCount ?? ""), 10);
+  return {
+    checkIn: String(b.checkIn ?? "").trim(),
+    checkOut: String(b.checkOut ?? "").trim(),
+    guestCount: Number.isFinite(guestCount) ? guestCount : NaN,
+  };
+}
+
 export async function getRetreatCalendar(
   from: string,
   to: string,
 ): Promise<PublicCalendarPayload | { error: string }> {
   try {
-    return await getCalendarApiPayload(from, to);
-  } catch {
+    const payload = await getCalendarApiPayload(from, to);
+    if (!payload.configured) {
+      return {
+        error:
+          "Calendar is unavailable — reservation database is not connected. Please try again later.",
+      };
+    }
+    return payload;
+  } catch (err) {
+    console.error("[booking/calendar]", err);
     return { error: "We could not load the calendar. Please try again." };
   }
 }
@@ -115,11 +158,13 @@ export async function getRetreatCalendar(
 export async function checkRetreatAvailability(
   checkIn: string,
   checkOut: string,
-): Promise<{ isAvailable: boolean; reason?: string } | { error: string }> {
+): Promise<{ isAvailable: boolean; reason?: string }> {
   try {
     return await checkAvailabilityForStay(checkIn, checkOut);
-  } catch {
-    return { error: "We could not verify availability for those dates. Please try again." };
+  } catch (err) {
+    console.error("[booking/availability] database check failed", err);
+    // Soft-fail: guest may still submit; host confirms manually if calendar query fails.
+    return { isAvailable: true };
   }
 }
 
@@ -130,7 +175,6 @@ export async function createRetreatReservation(
   if ("error" in quote) return quote;
 
   const availability = await checkRetreatAvailability(payload.checkIn, payload.checkOut);
-  if ("error" in availability) return availability;
   if (!availability.isAvailable) {
     return {
       error: availability.reason ?? "Those dates are not available. Please choose different dates.",
@@ -150,7 +194,10 @@ export async function createRetreatReservation(
 
     const row = serializeReservation(created);
     if (!row) {
-      return { error: "We could not save your request. Please try again." };
+      return {
+        error:
+          "We couldn't submit your request. Please check your details and try again.",
+      };
     }
 
     return {
@@ -161,13 +208,13 @@ export async function createRetreatReservation(
       nights: row.nights,
       subtotal: row.totalAmount,
       guestCount: row.guestCount,
-    message:
-      "Request received. We'll review your stay and send payment instructions if approved.",
+      message:
+        "Your request has been received. We'll review your stay and follow up with payment instructions if approved.",
     };
   } catch {
     return {
       error:
-        "We could not submit your request right now. Please try again in a moment, or contact us if this continues.",
+        "We couldn't submit your request. Please check your details and try again.",
     };
   }
 }

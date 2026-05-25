@@ -18,7 +18,7 @@ const TRUST_POINTS = [
 type AvailabilityUi =
   | { status: "idle" }
   | { status: "loading" }
-  | { status: "available" }
+  | { status: "available"; message?: string }
   | { status: "unavailable"; reason: string }
   | { status: "error"; message: string; softFail?: boolean };
 
@@ -134,7 +134,11 @@ export function StaySummaryCard({
             )}
 
             {!quoteLoading && hasDates && !quote && (
-              <p className="text-sm text-white/50">Enter valid dates to see your estimate.</p>
+              <p className="text-sm text-white/50">
+                {availability.status === "available"
+                  ? "Couldn't load your estimate — try refreshing the page."
+                  : "Enter valid dates to see your estimate."}
+              </p>
             )}
           </div>
 
@@ -153,7 +157,7 @@ export function StaySummaryCard({
               {availability.status === "available" && (
                 <span className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-sage-300" />
-                  Dates appear open on our calendar
+                  {availability.message ?? "Dates appear open on our calendar"}
                 </span>
               )}
               {availability.status === "unavailable" && availability.reason}
