@@ -2,9 +2,13 @@
 
 Service dashboard: [warwick-bethel-retreat on Render](https://dashboard.render.com/web/srv-d89s3abeo5us739694qg)
 
-**Public URL:** `https://warwick-bethel-retreat.onrender.com`
+**Public URL:** `https://warwick-bethel-retreat.onrender.com` (**.NET API**, Docker — not the Next.js site)
+
+The frontend lives on **Vercel** (separate project, repo root). This Render service was reconfigured from Node → Docker API.
 
 Neon database is already migrated and seeded (project `sweet-mouse-40532596`).
+
+**Automate:** `./scripts/configure-render-deploy.sh` then `./scripts/verify-render-api.sh`
 
 ## Required environment variables
 
