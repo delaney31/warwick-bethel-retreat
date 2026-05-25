@@ -13,7 +13,7 @@ Deploy **Warwick Bethel Retreat** on the **same stack** as Pacific Luxe Direct:
 GitHub (`WarwickBethelRetreat` — this repo)
     │
     ├──► Vercel: pacific-luxe-direct     (frontend/)           → Pacific Luxe site
-    ├──► Vercel: warwick-bethel-retreat  (repo root) → Retreat site
+                         ├──► Vercel: warwick-bethel-retreat  (repo root) → Retreat site
     │
     ├──► Render: pacific-luxe-api        (ProductLine=Vehicle)  → vehicle DB
     └──► Render: warwick-retreat-api     (ProductLine=Retreat)   → retreat DB
@@ -366,6 +366,55 @@ mkdir -p .vercel
 | Neon retreat DB | *(dashboard only)* |
 | GitHub repo | `https://github.com/<org>/PacificLuxeRentals` |
 | Pacific Luxe (existing) | See root [`DEPLOYMENT.md`](../DEPLOYMENT.md) |
+
+---
+
+## Stripe Checkout & webhooks (Vercel)
+
+Guest payments use **Stripe Checkout** only — card data never touches this app.
+
+### Environment variables (Vercel production)
+
+| Variable | Purpose |
+|----------|---------|
+| `STRIPE_SECRET_KEY` | Server: create Checkout Sessions |
+| `STRIPE_WEBHOOK_SECRET` | Verify `POST /api/stripe/webhook` signatures |
+| `NEXT_PUBLIC_APP_URL` | Success/cancel redirect URLs (e.g. `https://warwick-bethel-retreat.vercel.app`) |
+
+### Webhook endpoint
+
+1. [Stripe Dashboard](https://dashboard.stripe.com/webhooks) → **Add endpoint**
+2. URL: `https://<your-vercel-domain>/api/stripe/webhook`
+3. Events: **`checkout.session.completed`**
+4. Copy **Signing secret** → Vercel env `STRIPE_WEBHOOK_SECRET` (`whsec_...`)
+5. Redeploy Vercel after setting secrets
+
+Local testing:
+
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+# Use the printed whsec_... as STRIPE_WEBHOOK_SECRET in .env.local
+```
+
+### Payment flow
+
+1. Guest submits booking → `PENDING_REVIEW` in Postgres  
+2. Host **Approve & send payment** in `/admin` → `APPROVED_AWAITING_PAYMENT` + Checkout Session  
+3. Guest pays via Stripe (link: `/reservations/{id}/payment`)  
+4. Webhook marks reservation **`PAID_CONFIRMED`** (amount must match DB total)  
+5. Public calendar blocks those dates
+
+### Apple Pay & wallet methods
+
+Stripe Checkout can show **Apple Pay** when the customer's device and browser support it. For production, register your domain in Stripe:
+
+1. Stripe Dashboard → **Settings → Payment methods → Apple Pay** (or **Payment method domains**)
+2. Add your production hostname (e.g. `warwick-bethel-retreat.vercel.app` and any custom domain)
+3. Complete Stripe's domain verification (hosted file or DNS as instructed)
+
+See Stripe's guide: [Apple Pay on the Web](https://docs.stripe.com/apple-pay?platform=web).
+
+Wallet availability also depends on HTTPS, Safari/Chrome support, and the customer having Apple Pay set up — no extra code is required beyond Checkout.
 
 ---
 

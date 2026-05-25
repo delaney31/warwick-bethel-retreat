@@ -1,16 +1,57 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { isAdminRequestAuthenticated } from "@/lib/admin/auth";
 
-const PUBLIC_PATHS = ["/", "/rooms", "/gallery", "/availability", "/book", "/faq", "/contact", "/reservations", "/api", "/admin/login"];
+const PUBLIC_PATHS = [
+  "/",
+  "/rooms",
+  "/gallery",
+  "/availability",
+  "/book",
+  "/faq",
+  "/contact",
+  "/reservations",
+  "/api/booking",
+  "/api/reservations",
+  "/api/stripe/webhook",
+  "/admin/login",
+];
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (isPublicPath(pathname) || pathname.startsWith("/admin")) {
+
+  if (isPublicPath(pathname)) {
     return NextResponse.next();
   }
+
+  if (pathname.startsWith("/api/admin/auth/login")) {
+    return NextResponse.next();
+  }
+
+  const needsAdmin =
+    pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
+
+  if (!needsAdmin) {
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/admin/login")) {
+    return NextResponse.next();
+  }
+
+  const ok = await isAdminRequestAuthenticated(request);
+  if (!ok) {
+    if (pathname.startsWith("/api/admin")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const login = new URL("/admin/login", request.url);
+    login.searchParams.set("from", pathname);
+    return NextResponse.redirect(login);
+  }
+
   return NextResponse.next();
 }
 

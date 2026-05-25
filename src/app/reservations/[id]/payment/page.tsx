@@ -1,82 +1,73 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
+import { PaymentShell } from "@/components/public/payment-shell";
+import { GuestPaymentCard } from "@/components/public/guest-payment-card";
+import { fetchGuestReservation, type GuestReservationView } from "@/lib/guest/payment-api";
 import Link from "next/link";
-import { formatCurrency } from "@/lib/pricing";
-import { ReservationStatus, RESERVATION_STATUS_LABELS } from "@/types/reservation";
-import { Button } from "@/components/ui/button";
 
-export default function PaymentPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ success?: string; cancelled?: string }>;
-}) {
+export default function PaymentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const query = use(searchParams);
-  const [data, setData] = useState<{
-    reservation: { status: ReservationStatus; guestName: string; totalCents: number; nights: number; checkIn: string; checkOut: string };
-    payment: { status: string; stripeCheckoutSessionId: string | null } | null;
-  } | null>(null);
+  const [reservation, setReservation] = useState<GuestReservationView | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/reservations/${id}`)
-      .then((r) => r.json())
-      .then(setData);
+    fetchGuestReservation(id)
+      .then(setReservation)
+      .finally(() => setLoading(false));
   }, [id]);
 
-  if (!data) {
+  if (loading) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-stone-50">
-        <p className="text-stone-500">Loading…</p>
+        <p className="text-stone-500">Loading your reservation…</p>
       </div>
     );
   }
 
-  const { reservation } = data;
-
-  if (query.success === "1" || reservation.status === ReservationStatus.Confirmed) {
+  if (!reservation) {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-stone-950 px-4 text-center text-white">
-        <p className="text-[11px] uppercase tracking-widest text-amber-400">Confirmed</p>
-        <h1 className="mt-4 font-serif text-3xl font-light">Your retreat is booked</h1>
-        <p className="mt-4 max-w-md text-sm text-white/70">
-          Thank you, {reservation.guestName}. Your dates are secured — we look forward to hosting you.
+      <PaymentShell
+        eyebrow="Payment"
+        title="Reservation not found"
+        subtitle="This link may be invalid or expired."
+      >
+        <p className="text-center text-sm text-stone-600">
+          <Link href="/contact" className="text-sage-700 underline">
+            Contact your host
+          </Link>{" "}
+          for assistance.
         </p>
-        <Link href="/" className="mt-8 text-amber-400 hover:text-amber-300">Return home →</Link>
-      </div>
+      </PaymentShell>
+    );
+  }
+
+  if (reservation.isPaid) {
+    return (
+      <PaymentShell
+        dark
+        eyebrow="Confirmed"
+        title="Your retreat is booked"
+        subtitle={`Thank you, ${reservation.guestName}. Your dates are secured — we look forward to hosting you.`}
+      >
+        <p className="text-center text-sm text-white/60">
+          {reservation.checkIn} → {reservation.checkOut} · {formatStay(reservation)}
+        </p>
+      </PaymentShell>
     );
   }
 
   return (
-    <div className="min-h-dvh bg-stone-50">
-      <div className="bg-stone-950 px-4 py-16 text-center text-white md:py-20">
-        <p className="text-[11px] uppercase tracking-widest text-amber-400">Payment</p>
-        <h1 className="mt-3 font-serif text-3xl font-light">Complete your reservation</h1>
-        <p className="mt-2 text-sm text-white/60">
-          {RESERVATION_STATUS_LABELS[reservation.status]}
-        </p>
-      </div>
-      <div className="mx-auto max-w-lg px-4 py-12">
-        <div className="glass-panel rounded-2xl p-8 shadow-xl">
-          <dl className="space-y-3 text-sm">
-            <div className="flex justify-between"><dt className="text-stone-500">Dates</dt><dd>{reservation.checkIn} → {reservation.checkOut}</dd></div>
-            <div className="flex justify-between"><dt className="text-stone-500">Nights</dt><dd>{reservation.nights}</dd></div>
-            <div className="flex justify-between border-t border-stone-200 pt-3 text-lg"><dt>Total due</dt><dd className="font-medium">{formatCurrency(reservation.totalCents)}</dd></div>
-          </dl>
-          {reservation.status === ReservationStatus.AwaitingPayment && (
-            <p className="mt-6 text-sm text-stone-600">
-              Check your email for the secure Stripe checkout link supporting credit card and Apple Pay.
-              If you need the link resent, contact your host.
-            </p>
-          )}
-          {query.cancelled === "1" && (
-            <p className="mt-4 text-sm text-amber-800">Payment was cancelled. Use the link in your approval email to try again.</p>
-          )}
-          <Button href="/" variant="secondary" className="mt-8 w-full">Back to site</Button>
-        </div>
-      </div>
-    </div>
+    <PaymentShell
+      eyebrow="Secure payment"
+      title="Complete your reservation"
+      subtitle="Full payment confirms your dates on our calendar."
+    >
+      <GuestPaymentCard reservation={reservation} />
+    </PaymentShell>
   );
+}
+
+function formatStay(r: GuestReservationView) {
+  return `${r.nights} night${r.nights !== 1 ? "s" : ""} · ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(r.totalAmount)}`;
 }

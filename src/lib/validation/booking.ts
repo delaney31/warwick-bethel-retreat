@@ -41,6 +41,13 @@ export function validateBookingForm(
   if (!data.guestEmail.trim() || !EMAIL_RE.test(data.guestEmail.trim())) {
     errors.push({ field: "guestEmail", message: "A valid email is required." });
   }
+  const phoneDigits = data.guestPhone.replace(/\D/g, "");
+  if (!data.guestPhone.trim() || phoneDigits.length < 10) {
+    errors.push({
+      field: "guestPhone",
+      message: "A valid phone number is required (at least 10 digits).",
+    });
+  }
   if (!data.checkIn) errors.push({ field: "checkIn", message: "Check-in is required." });
   if (!data.checkOut) errors.push({ field: "checkOut", message: "Check-out is required." });
   if (data.checkIn && data.checkOut) {

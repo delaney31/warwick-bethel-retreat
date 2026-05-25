@@ -1,26 +1,29 @@
 import type { Metadata } from "next";
 import { AvailabilityCalendar } from "@/components/public/availability-calendar";
-import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Availability",
-  description: "Interactive calendar — see booked, pending, and available dates.",
+  description:
+    "See available, pending, booked, and blocked dates — select your stay and request reservation.",
 };
 
 export default function AvailabilityPage() {
   return (
-    <div className="bg-stone-50 pt-28 pb-20">
-      <div className="mx-auto max-w-3xl px-4 md:px-8">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-sage-600">Calendar</p>
-        <h1 className="mt-3 font-serif text-4xl font-light text-stone-900">Availability</h1>
-        <p className="mt-4 text-stone-600">
-          Real-time calendar with overbooking prevention. Submit a request for open dates.
+    <div className="bg-gradient-to-b from-stone-100 via-stone-50 to-stone-50 pt-28 pb-24">
+      <div className="mx-auto max-w-4xl px-4 md:px-8">
+        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.35em] text-sage-600">
+          Plan your retreat
         </p>
-        <div className="mt-10">
+        <h1 className="mt-3 text-center font-serif text-4xl font-light text-stone-900 md:text-5xl">
+          Availability
+        </h1>
+        <p className="mx-auto mt-4 max-w-2xl text-center text-stone-600">
+          Live calendar from our reservation system — confirmed stays and host blocks are protected.
+          Pending requests are shown so you know what is in review. Select open dates and continue to
+          your reservation request.
+        </p>
+        <div className="mt-12">
           <AvailabilityCalendar />
-        </div>
-        <div className="mt-10 text-center">
-          <Button href="/book" size="lg">Request These Dates</Button>
         </div>
       </div>
     </div>

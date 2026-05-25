@@ -31,7 +31,7 @@ export default function AdminPaymentsPage() {
       <PageHeader title="Payments" description="Mark payments in Pacific Luxe admin when Stripe is wired" />
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
       <p className="mt-4 text-sm text-stone-600">
-        Use POST /api/admin/reservations/{"{id}"}/payments in Swagger (API :5002) to record charges, then mark paid to confirm.
+        Use POST /api/admin/reservations/{"{id}"}/payments in the admin API to record charges, then mark paid to confirm.
       </p>
       <div className="mt-8 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
         <table className="w-full text-left text-sm">

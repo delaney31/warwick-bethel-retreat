@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { Suspense, useEffect, useRef, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import {
-  createReservation,
-  checkAvailability,
-  getVehicleBySlug,
-  getApiErrorMessage,
-} from "@/lib/api";
-import { RETREAT_SLUG, MAX_GUESTS } from "@/lib/constants";
+  fetchBookingAvailability,
+  fetchBookingQuote,
+  isBookingApiError,
+  submitBookingRequest,
+  type BookingQuote,
+  type BookingSubmitSuccess,
+} from "@/lib/api/booking-public";
+import { MAX_GUESTS } from "@/lib/constants";
 import {
   validateBookingForm,
-  calculateRetreatPricing,
-  formatCurrency,
   todayISO,
   type FieldError,
 } from "@/lib/validation/booking";
-import type { BookingRequestFormData, Reservation } from "@/types/reservation";
+import type { BookingRequestFormData } from "@/types/reservation";
+import { ReservationStatus } from "@/types/reservation";
 import { useReservationStore } from "@/lib/store/reservation-store";
+import { StaySummaryCard } from "@/components/public/stay-summary-card";
+import { BookingConfirmation } from "@/components/public/booking-confirmation";
 import { FormField } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
@@ -36,35 +40,30 @@ type AvailabilityState =
   | { status: "loading" }
   | { status: "available" }
   | { status: "unavailable"; reason: string }
-  | { status: "error"; message: string };
+  | { status: "error"; message: string; softFail?: boolean };
 
-export function BookingRequestForm() {
+function BookingRequestFormInner() {
+  const searchParams = useSearchParams();
+  const datesFromCalendar = useRef(false);
   const { addReservation } = useReservationStore();
-  const [vehicleId, setVehicleId] = useState<string | null>(null);
   const [form, setForm] = useState<BookingRequestFormData>(EMPTY);
   const [errors, setErrors] = useState<FieldError[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<Reservation | null>(null);
+  const [success, setSuccess] = useState<BookingSubmitSuccess | null>(null);
   const [availability, setAvailability] = useState<AvailabilityState>({ status: "idle" });
+  const [quote, setQuote] = useState<BookingQuote | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
+  const [prefilledFromCalendar, setPrefilledFromCalendar] = useState(false);
 
   useEffect(() => {
-    getVehicleBySlug(RETREAT_SLUG).then((v) => {
-      if (v) setVehicleId(v.id);
-    });
-  }, []);
-
-  const pricing = useMemo(() => {
-    if (!form.checkIn || !form.checkOut) return null;
-    const nights = Math.max(
-      0,
-      Math.floor(
-        (new Date(form.checkOut).getTime() - new Date(form.checkIn).getTime()) / 86400000,
-      ),
-    );
-    if (nights <= 0) return null;
-    return calculateRetreatPricing(parseInt(form.guestCount, 10) || 2, nights);
-  }, [form.checkIn, form.checkOut, form.guestCount]);
+    const checkIn = searchParams.get("checkIn")?.trim();
+    const checkOut = searchParams.get("checkOut")?.trim();
+    if (!checkIn || !checkOut || checkOut <= checkIn || datesFromCalendar.current) return;
+    datesFromCalendar.current = true;
+    setForm((prev) => ({ ...prev, checkIn, checkOut }));
+    setPrefilledFromCalendar(true);
+  }, [searchParams]);
 
   function fieldError(field: keyof BookingRequestFormData) {
     return errors.find((e) => e.field === field)?.message;
@@ -74,29 +73,69 @@ export function BookingRequestForm() {
     setForm((p) => ({ ...p, [field]: value }));
     setErrors((p) => p.filter((e) => e.field !== field));
     setSubmitError(null);
-    if (field === "checkIn" || field === "checkOut") setAvailability({ status: "idle" });
+    if (field === "checkIn" || field === "checkOut") {
+      setAvailability({ status: "idle" });
+      setQuote(null);
+    }
+    if (field === "guestCount") setQuote(null);
   }
 
   useEffect(() => {
-    if (!vehicleId || !form.checkIn || !form.checkOut) return;
+    if (!form.checkIn || !form.checkOut) return;
     const timer = setTimeout(() => {
       setAvailability({ status: "loading" });
-      checkAvailability(vehicleId, form.checkIn, form.checkOut)
+      fetchBookingAvailability({ checkIn: form.checkIn, checkOut: form.checkOut })
         .then((r) => {
+          if (isBookingApiError(r)) {
+            setAvailability({
+              status: "error",
+              message: r.error,
+              softFail: "softFail" in r && Boolean((r as { softFail?: boolean }).softFail),
+            });
+            return;
+          }
           if (r.isAvailable) setAvailability({ status: "available" });
-          else setAvailability({ status: "unavailable", reason: r.reason ?? "Dates unavailable" });
+          else
+            setAvailability({
+              status: "unavailable",
+              reason: r.reason ?? "Those dates are not available for a confirmed stay.",
+            });
         })
-        .catch(() => setAvailability({ status: "error", message: "Could not check availability." }));
+        .catch(() =>
+          setAvailability({
+            status: "error",
+            message:
+              "We could not verify dates right now. You may still submit — our host will confirm availability.",
+            softFail: true,
+          }),
+        );
     }, 400);
     return () => clearTimeout(timer);
-  }, [vehicleId, form.checkIn, form.checkOut]);
+  }, [form.checkIn, form.checkOut]);
+
+  useEffect(() => {
+    if (!form.checkIn || !form.checkOut) return;
+    const guests = parseInt(form.guestCount, 10);
+    if (!guests || guests < 1) return;
+
+    const timer = setTimeout(() => {
+      setQuoteLoading(true);
+      fetchBookingQuote({ checkIn: form.checkIn, checkOut: form.checkOut, guestCount: guests })
+        .then((r) => {
+          if (isBookingApiError(r)) {
+            setQuote(null);
+            return;
+          }
+          setQuote(r);
+        })
+        .catch(() => setQuote(null))
+        .finally(() => setQuoteLoading(false));
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [form.checkIn, form.checkOut, form.guestCount]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!vehicleId) {
-      setSubmitError("Property is not available. Is the retreat API running?");
-      return;
-    }
     const validationErrors = validateBookingForm(form, MAX_GUESTS);
     if (validationErrors.length) {
       setErrors(validationErrors);
@@ -107,101 +146,206 @@ export function BookingRequestForm() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const created = await createReservation({
-        vehicleId,
-        renterName: form.guestName.trim(),
-        renterEmail: form.guestEmail.trim(),
-        renterPhone: form.guestPhone.trim(),
-        startDate: form.checkIn,
-        endDate: form.checkOut,
-        pickupPreference: "SantaMonica",
-        driverAge: parseInt(form.guestCount, 10),
-        notes: form.guestNotes.trim(),
+      const result = await submitBookingRequest({
+        guestName: form.guestName.trim(),
+        guestEmail: form.guestEmail.trim(),
+        guestPhone: form.guestPhone.trim(),
+        checkIn: form.checkIn,
+        checkOut: form.checkOut,
+        guestCount: parseInt(form.guestCount, 10),
+        guestNotes: form.guestNotes.trim(),
       });
-      const reservation: Reservation = {
-        id: created.id,
-        vehicleId,
+
+      if (isBookingApiError(result)) {
+        if (result.fields?.length) setErrors(result.fields);
+        setSubmitError(result.error);
+        return;
+      }
+
+      addReservation({
+        id: result.id,
+        vehicleId: "",
         vehicleDisplayName: "Warwick Bethel Retreat",
-        status: "pending_review" as Reservation["status"],
-        renterName: form.guestName,
+        status: ReservationStatus.PendingReview,
+        renterName: result.guestName,
         email: form.guestEmail,
         phone: form.guestPhone,
-        startDate: form.checkIn,
-        endDate: form.checkOut,
+        startDate: result.checkIn,
+        endDate: result.checkOut,
         pickupPreference: "santa_monica",
-        driverAge: parseInt(form.guestCount, 10),
+        driverAge: result.guestCount,
         notes: form.guestNotes,
-        rentalDays: pricing?.nights ?? 1,
+        rentalDays: result.nights,
         dailyRateAtBooking: 150,
-        subtotal: pricing?.subtotal ?? 0,
+        subtotal: result.subtotal,
         createdAt: new Date().toISOString(),
-      };
-      addReservation(reservation);
-      setSuccess(reservation);
-    } catch (err) {
-      setSubmitError(getApiErrorMessage(err));
+      });
+      setSuccess({
+        ...result,
+        message:
+          "Request received. We'll review your stay and send payment instructions if approved.",
+      });
+    } catch {
+      setSubmitError(
+        "We could not submit your request right now. Please try again in a moment.",
+      );
     } finally {
       setSubmitting(false);
     }
   }
 
   if (success) {
-    return (
-      <div className="glass-panel rounded-2xl p-8 text-center shadow-xl">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-sage-600">Request received</p>
-        <h3 className="mt-3 text-2xl font-light text-stone-900">Thank you, {success.renterName}</h3>
-        <p className="mt-4 text-sm text-stone-600">
-          Status: <strong>Pending Review</strong>. Reference:{" "}
-          <span className="font-mono text-xs">{success.id}</span>
-        </p>
-        <p className="mt-4 text-sm text-stone-500">
-          Estimated total: {formatCurrency(success.subtotal)} · {success.rentalDays} night(s)
-        </p>
-      </div>
-    );
+    return <BookingConfirmation success={success} />;
   }
 
+  const canSubmit =
+    availability.status !== "unavailable" &&
+    !submitting &&
+    !(availability.status === "loading" || quoteLoading);
+
   return (
-    <form onSubmit={onSubmit} className="glass-panel space-y-6 rounded-2xl p-6 shadow-xl md:p-8">
-      {!vehicleId && (
-        <p className="text-sm text-amber-800">
-          Connecting to reservation API… Start the retreat API on port 5002 if this persists.
-        </p>
-      )}
-      <div className="grid gap-6 md:grid-cols-2">
-        <FormField label="Full name" name="guestName" value={form.guestName} onChange={(e) => update("guestName", e.target.value)} error={fieldError("guestName")} required />
-        <FormField label="Email" name="guestEmail" type="email" value={form.guestEmail} onChange={(e) => update("guestEmail", e.target.value)} error={fieldError("guestEmail")} required />
-        <FormField label="Phone" name="guestPhone" type="tel" value={form.guestPhone} onChange={(e) => update("guestPhone", e.target.value)} />
-        <FormField label="Guests" name="guestCount" as="select" value={form.guestCount} onChange={(e) => update("guestCount", e.target.value)} error={fieldError("guestCount")}>
-          {Array.from({ length: MAX_GUESTS }, (_, i) => i + 1).map((n) => (
-            <option key={n} value={String(n)}>{n} guest{n > 1 ? "s" : ""}</option>
-          ))}
-        </FormField>
-        <FormField label="Check-in" name="checkIn" type="date" min={todayISO()} value={form.checkIn} onChange={(e) => update("checkIn", e.target.value)} error={fieldError("checkIn")} required />
-        <FormField label="Check-out" name="checkOut" type="date" min={form.checkIn || todayISO()} value={form.checkOut} onChange={(e) => update("checkOut", e.target.value)} error={fieldError("checkOut")} required />
-      </div>
-      <FormField label="Notes for your host" name="guestNotes" as="textarea" rows={4} value={form.guestNotes} onChange={(e) => update("guestNotes", e.target.value)} />
-
-      {availability.status === "loading" && <p className="text-sm text-stone-500">Checking availability…</p>}
-      {availability.status === "available" && <p className="text-sm text-sage-700">✓ Dates appear available</p>}
-      {availability.status === "unavailable" && <p className="text-sm text-red-600">{availability.reason}</p>}
-
-      {pricing && (
-        <div className="rounded-xl border border-stone-200 bg-stone-50/80 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500">Estimated total</p>
-          <p className="mt-1 text-2xl font-light text-stone-900">{formatCurrency(pricing.subtotal)}</p>
-          <p className="mt-1 text-xs text-stone-500">
-            {pricing.nights} night(s) · $150/night for 2 guests
-            {pricing.extraGuests > 0 && ` · +$25/night × ${pricing.extraGuests} extra`}
+    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start">
+      <form
+        onSubmit={onSubmit}
+        className="rounded-3xl border border-stone-200/60 bg-white/80 p-6 shadow-xl shadow-stone-900/5 backdrop-blur-sm md:p-8"
+      >
+        {prefilledFromCalendar && form.checkIn && form.checkOut && (
+          <p className="mb-6 rounded-xl border border-sage-200/80 bg-sage-50/90 px-4 py-3 text-sm text-sage-900">
+            Dates selected from our availability calendar.
           </p>
+        )}
+
+        <div className="space-y-6">
+          <div>
+            <h3 className="font-serif text-lg font-light text-stone-900">Your details</h3>
+            <div className="mt-4 grid gap-5 sm:grid-cols-2">
+              <FormField
+                label="Full name"
+                name="guestName"
+                value={form.guestName}
+                onChange={(e) => update("guestName", e.target.value)}
+                error={fieldError("guestName")}
+                required
+              />
+              <FormField
+                label="Email"
+                name="guestEmail"
+                type="email"
+                value={form.guestEmail}
+                onChange={(e) => update("guestEmail", e.target.value)}
+                error={fieldError("guestEmail")}
+                required
+              />
+              <FormField
+                label="Phone"
+                name="guestPhone"
+                type="tel"
+                value={form.guestPhone}
+                onChange={(e) => update("guestPhone", e.target.value)}
+                error={fieldError("guestPhone")}
+                required
+                className="sm:col-span-2"
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-serif text-lg font-light text-stone-900">Your stay</h3>
+            <div className="mt-4 grid gap-5 sm:grid-cols-2">
+              <FormField
+                label="Guests"
+                name="guestCount"
+                as="select"
+                value={form.guestCount}
+                onChange={(e) => update("guestCount", e.target.value)}
+                error={fieldError("guestCount")}
+              >
+                {Array.from({ length: MAX_GUESTS }, (_, i) => i + 1).map((n) => (
+                  <option key={n} value={String(n)}>
+                    {n} guest{n > 1 ? "s" : ""}
+                  </option>
+                ))}
+              </FormField>
+              <div className="hidden sm:block" aria-hidden />
+              <FormField
+                label="Check-in"
+                name="checkIn"
+                type="date"
+                min={todayISO()}
+                value={form.checkIn}
+                onChange={(e) => update("checkIn", e.target.value)}
+                error={fieldError("checkIn")}
+                required
+              />
+              <FormField
+                label="Check-out"
+                name="checkOut"
+                type="date"
+                min={form.checkIn || todayISO()}
+                value={form.checkOut}
+                onChange={(e) => update("checkOut", e.target.value)}
+                error={fieldError("checkOut")}
+                required
+              />
+            </div>
+          </div>
+
+          <FormField
+            label="Notes for your host"
+            name="guestNotes"
+            as="textarea"
+            rows={4}
+            value={form.guestNotes}
+            onChange={(e) => update("guestNotes", e.target.value)}
+            hint="Arrival time, special requests, or questions — optional."
+          />
         </div>
-      )}
 
-      {submitError && <p className="text-sm text-red-600">{submitError}</p>}
+        {submitError && (
+          <p className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+            {submitError}
+          </p>
+        )}
 
-      <Button type="submit" size="lg" className={cn("w-full", submitting && "opacity-70")} disabled={submitting || !vehicleId || availability.status === "unavailable"}>
-        {submitting ? "Submitting…" : "Submit Reservation Request"}
-      </Button>
-    </form>
+        <Button
+          type="submit"
+          size="lg"
+          className={cn("mt-8 w-full", submitting && "opacity-70")}
+          disabled={!canSubmit}
+        >
+          {submitting ? "Sending request…" : "Submit reservation request"}
+        </Button>
+
+        <p className="mt-4 text-center text-xs text-stone-400">
+          No payment today — host approval required before checkout.
+        </p>
+      </form>
+
+      <StaySummaryCard
+        checkIn={form.checkIn}
+        checkOut={form.checkOut}
+        guestCount={form.guestCount}
+        quote={quote}
+        quoteLoading={quoteLoading}
+        availability={availability}
+      />
+    </div>
+  );
+}
+
+function BookingFormFallback() {
+  return (
+    <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
+      <div className="h-[32rem] animate-pulse rounded-3xl bg-stone-200/50" />
+      <div className="h-[28rem] animate-pulse rounded-3xl bg-stone-200/50" />
+    </div>
+  );
+}
+
+export function BookingRequestForm() {
+  return (
+    <Suspense fallback={<BookingFormFallback />}>
+      <BookingRequestFormInner />
+    </Suspense>
   );
 }

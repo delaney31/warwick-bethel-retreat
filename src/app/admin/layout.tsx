@@ -12,9 +12,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <AdminAuthGuard>
-      <div className="flex min-h-dvh bg-stone-50/80">
+      <div className="flex min-h-dvh flex-col bg-gradient-to-br from-stone-100 via-stone-50 to-sage-50/20 md:flex-row">
         <AdminSidebar />
-        <div className="flex-1 overflow-auto p-6 md:p-10">{children}</div>
+        <main className="flex-1 overflow-auto px-4 py-8 md:px-10 md:py-12">{children}</main>
       </div>
     </AdminAuthGuard>
   );

@@ -7,44 +7,52 @@ import { PROPERTY_IMAGES } from "@/lib/content/property";
 
 export function HeroSection() {
   return (
-    <section className="relative flex min-h-dvh items-end overflow-hidden bg-stone-950 pb-24 pt-28">
+    <section className="relative flex min-h-dvh items-end overflow-hidden bg-stone-950 pb-20 pt-28 md:pb-28">
       <div className="absolute inset-0">
         <PropertyImage
           src={PROPERTY_IMAGES.hero}
-          alt="Warwick Bethel Retreat — luxury wooded cottage"
+          alt="Warwick Bethel Retreat — luxury home in a quiet wooded setting"
           imageKey="hero"
           fill
           priority
-          className="opacity-70"
+          className="scale-105 object-cover opacity-75"
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/60 to-stone-950/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/55 to-stone-950/25" />
+        <div className="absolute inset-0 bg-gradient-to-r from-stone-950/40 to-transparent" />
       </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: 28 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-10 mx-auto w-full max-w-7xl px-4 md:px-8"
       >
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-amber-400">
-          Warwick, New York · 15 minutes from Warwick Bethel
+        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-amber-400/95">
+          Warwick Bethel Retreat · Luxury nightly stay
         </p>
-        <h1 className="mt-4 max-w-3xl text-4xl font-light leading-[1.08] tracking-tight text-white md:text-6xl">
-          A quiet luxury retreat for your Bethel visit
+        <h1 className="mt-5 max-w-4xl font-serif text-4xl font-light leading-[1.06] tracking-tight text-white md:text-6xl lg:text-[3.5rem]">
+          A peaceful luxury stay minutes from Warwick Bethel
         </h1>
-        <p className="mt-6 max-w-xl text-base leading-relaxed text-white/75 md:text-lg">
-          Vaulted ceilings, hardwood floors, a wooded deck, and warm minimal interiors —
-          personally hosted nightly stays designed for visitors, couples, and families.
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/72 md:text-lg md:leading-relaxed">
+          Two serene bedrooms, wooded views, and warm private hosting for Bethel visitors who want
+          comfort after full days at Warwick.
         </p>
-        <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Button href="/book" size="lg">
             Request Your Stay
           </Button>
-          <Button href="/gallery" variant="secondary" size="lg">
-            View the Retreat
+          <Button
+            href="/rooms"
+            size="lg"
+            className="border-white/25 bg-white/10 text-white backdrop-blur-sm hover:bg-white/15"
+          >
+            View Rooms
           </Button>
         </div>
+        <p className="mt-8 text-sm text-white/45">
+          Personally reviewed by your host · No payment until approved
+        </p>
       </motion.div>
     </section>
   );

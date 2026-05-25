@@ -6,7 +6,7 @@ Luxury nightly stay website — **15 minutes from Warwick Bethel**.
 |-------|------------|
 | **Frontend** | Next.js 15 (repo root) → deploy on **Vercel** |
 | **API** | ASP.NET Core 8 in [`api/PacificLuxe.Api/`](api/PacificLuxe.Api/) → deploy on **Render** |
-| **Database** | **Neon** PostgreSQL (separate from Pacific Luxe Direct) |
+| **Database** | **Neon** PostgreSQL — Prisma for reservations & calendar blocks (Vercel); optional ASP.NET API for legacy admin |
 
 This repository is **standalone**. Pacific Luxe Direct vehicle rentals live in a different repo.
 
@@ -23,6 +23,8 @@ dotnet run --launch-profile retreat
 
 ```bash
 cp .env.example .env
+# Set DATABASE_URL (Neon or local Postgres), then:
+npx prisma migrate deploy
 npm install
 npm run dev
 ```
