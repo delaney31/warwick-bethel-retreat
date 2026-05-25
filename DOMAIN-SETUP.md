@@ -1,59 +1,122 @@
-# Tuxedo Retreat — Custom domain (tuxedoretreat.com)
+# Tuxedo Retreat — Production domain (tuxedoretreat.com)
 
-Production site: **https://tuxedoretreat.com**  
-Brand: **Tuxedo Retreat** (SEO still references Warwick Bethel proximity)
+**Canonical site:** https://tuxedoretreat.com  
+**Brand:** Tuxedo Retreat (SEO copy still mentions proximity to Warwick Bethel)
 
 ---
 
-## 1. Vercel project domains
+## Production diagnosis (2026-05-25)
 
-In [Vercel](https://vercel.com) → **warwick-bethel-retreat** project → **Settings → Domains**:
+| Check | Result | Action |
+|-------|--------|--------|
+| `dig tuxedoretreat.com A` | `3.33.251.168`, `15.197.225.128` (AWS) | **Wrong** — must be Vercel `76.76.21.21` |
+| `dig www.tuxedoretreat.com` | *(often missing)* | Add **CNAME** → `cname.vercel-dns.com` |
+| `warwick-bethel-retreat.vercel.app/book` | 308 → `https://tuxedoretreat.com/book` | App redirects OK |
+| `warwick-bethel-retreat.vercel.app/` | 308 → `warwick.bethel.retreat.vercel.app` | **Fix Vercel Domains** (dashboard redirect) |
+| App env `NEXT_PUBLIC_APP_URL` | Must be `https://tuxedoretreat.com` | Set in Vercel Production + redeploy |
 
-| Domain | Expected behavior |
+Until apex DNS points to Vercel, guests hitting `tuxedoretreat.com` may not reach your Next.js app.
+
+---
+
+## 1. Vercel custom domains
+
+**Project:** `warwick-bethel-retreat` → [Vercel Domains](https://vercel.com/delaney31s-projects/warwick-bethel-retreat/settings/domains)
+
+| Domain | Required behavior |
 |--------|-------------------|
-| `tuxedoretreat.com` | **Primary** — serves the site |
-| `www.tuxedoretreat.com` | Redirects to `tuxedoretreat.com` (308) |
-| `warwick-bethel-retreat.vercel.app` | Redirects to `tuxedoretreat.com` (308) — configured in `vercel.json` + middleware |
+| `tuxedoretreat.com` | **Primary domain** — serves the site, SSL valid |
+| `www.tuxedoretreat.com` | Redirect to apex (308) — app + `vercel.json` |
+| `warwick-bethel-retreat.vercel.app` | Redirect to `tuxedoretreat.com` (308) |
+| `warwick.bethel.retreat.vercel.app` | Redirect to `tuxedoretreat.com` (308) |
 
-Set **Primary Domain** to `tuxedoretreat.com` (not the `.vercel.app` URL).
+### Vercel dashboard steps
 
----
-
-## 2. DNS at your registrar
-
-Point DNS to Vercel (values shown in Vercel → Domains → DNS Records):
-
-### Apex (`tuxedoretreat.com`)
-
-Usually one of:
-
-- **A** record → `76.76.21.21` (Vercel apex), or  
-- **ALIAS / ANAME / flattened CNAME** → `cname.vercel-dns.com` (if your registrar supports apex CNAME)
-
-### `www` (`www.tuxedoretreat.com`)
-
-- **CNAME** → `cname.vercel-dns.com`
-
-Wait for DNS propagation (minutes to 48 hours). Vercel will issue SSL automatically when DNS is correct.
+1. **Settings → Domains** → add `tuxedoretreat.com` and `www.tuxedoretreat.com` if missing.
+2. Click **`tuxedoretreat.com` → Set as Primary Domain** (not `.vercel.app`).
+3. Remove any rule that **redirects the custom domain to a `.vercel.app` URL** (that causes guests to leave `tuxedoretreat.com`).
+4. For `www`, choose **Redirect to tuxedoretreat.com** (or let app middleware handle it).
+5. **Redeploy** after env var changes.
 
 ---
 
-## 3. Required Vercel environment variables (Production)
+## 2. DNS records (registrar)
 
-Update **all** environments you use (at minimum **Production**):
+Use the exact values Vercel shows under **Domains → DNS Records** for your project.
 
-| Variable | Value |
-|----------|--------|
+### Apex — `tuxedoretreat.com`
+
+| Type | Name | Value |
+|------|------|--------|
+| **A** | `@` | `76.76.21.21` |
+
+*(Or use Vercel nameservers / ALIAS to `cname.vercel-dns.com` if your registrar supports apex CNAME.)*
+
+**Do not use** parking/AWS IPs (`3.33.x`, `15.197.x`) — those are not Vercel.
+
+### WWW — `www.tuxedoretreat.com`
+
+| Type | Name | Value |
+|------|------|--------|
+| **CNAME** | `www` | `cname.vercel-dns.com` |
+
+### Verify DNS
+
+```bash
+dig +short tuxedoretreat.com A
+# Expected: 76.76.21.21
+
+dig +short www.tuxedoretreat.com CNAME
+# Expected: cname.vercel-dns.com
+```
+
+SSL: Vercel issues certificates automatically when DNS is correct (can take up to 48h).
+
+---
+
+## 3. Redirect behavior (code + Vercel)
+
+Implemented in:
+
+- `vercel.json` — host-based 308 redirects
+- `next.config.ts` — same redirects at build time
+- `src/middleware.ts` + `src/lib/server/canonical-host.ts` — runtime 308 for legacy hosts
+
+| Request | Expected |
+|---------|----------|
+| `https://tuxedoretreat.com/*` | **200** — stays on apex |
+| `https://www.tuxedoretreat.com/*` | **308** → `https://tuxedoretreat.com/*` |
+| `https://warwick-bethel-retreat.vercel.app/*` | **308** → `https://tuxedoretreat.com/*` |
+| `https://warwick.bethel.retreat.vercel.app/*` | **308** → `https://tuxedoretreat.com/*` |
+
+Run: `chmod +x scripts/verify-production-domain.sh && ./scripts/verify-production-domain.sh`
+
+---
+
+## 4. App configuration (Vercel Production env)
+
+| Variable | Required value |
+|----------|----------------|
 | `NEXT_PUBLIC_APP_URL` | `https://tuxedoretreat.com` |
 | `NEXT_PUBLIC_APP_NAME` | `Tuxedo Retreat` |
-| `DATABASE_URL` | *(unchanged — Neon pooled URL)* |
-| `ADMIN_PASSWORD` | *(your host password)* |
+| `DATABASE_URL` | Neon pooled URL |
+| `ADMIN_PASSWORD` | Host password (8+ chars) |
 | `STRIPE_SECRET_KEY` | `sk_live_...` or `sk_test_...` |
-| `STRIPE_WEBHOOK_SECRET` | `whsec_...` from webhook on **custom domain** |
+| `STRIPE_WEBHOOK_SECRET` | From webhook on custom domain |
 
-**Redeploy** after changing env vars.
+**Redeploy** after any change.
 
-### Stripe webhook URL (production)
+### What uses `NEXT_PUBLIC_APP_URL`
+
+- HTML canonical + Open Graph + Twitter (`src/lib/content/site-metadata.ts`)
+- `/sitemap.xml`, `/robots.txt`
+- Stripe Checkout success/cancel URLs (`src/lib/stripe/checkout.ts`)
+- Guest payment links in admin (`getCanonicalSiteUrl()`)
+- Contact mailto stays `bookings@tuxedoretreat.com`
+
+Production code **never** emits `*.vercel.app` in URLs when `VERCEL_ENV=production`, even if env is wrong.
+
+### Stripe webhook (production)
 
 ```
 https://tuxedoretreat.com/api/stripe/webhook
@@ -63,39 +126,37 @@ Events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`
 
 ---
 
-## 4. What the app enforces in code
+## 5. Production route checklist
 
-- **`NEXT_PUBLIC_APP_URL`** drives canonical URLs, Open Graph, sitemap, robots, Stripe success/cancel redirects, and guest payment links.
-- **Middleware** + **`vercel.json`** 308-redirect:
-  - `www.tuxedoretreat.com` → `tuxedoretreat.com`
-  - `*.vercel.app` (legacy project URL) → `tuxedoretreat.com`
-- **`getAppUrl()` / `getAppOrigin()`** no longer fall back to `VERCEL_URL` (avoids leaking the Vercel hostname in links).
+After DNS + Vercel primary domain + redeploy:
+
+| Route | Expect |
+|-------|--------|
+| `/` | Homepage, title **Tuxedo Retreat**, URL stays on `tuxedoretreat.com` |
+| `/book` | Booking form, `/api/booking/*` on same host |
+| `/availability` | Calendar loads |
+| `/rooms` | Rooms page |
+| `/gallery` | Gallery |
+| `/faq` | FAQ |
+| `/contact` | Contact form |
+| `/admin` | Redirect to `/admin/login` |
+| `/admin/login` | Host login |
+| `/sitemap.xml` | All `<loc>` URLs use `https://tuxedoretreat.com` |
+| `/robots.txt` | `Sitemap: https://tuxedoretreat.com/sitemap.xml` |
+
+### Booking sanity
+
+- No `localhost`, no port `5002`, no Render API rewrite on `/api/booking`
+- Payment copy link: `https://tuxedoretreat.com/reservations/{id}/payment`
 
 ---
 
-## 5. Troubleshooting redirects
+## 6. Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---------|----------------|-----|
-| `tuxedoretreat.com` → `warwick-bethel-retreat.vercel.app` | Primary domain in Vercel is still `.vercel.app` | Set primary to `tuxedoretreat.com` |
-| `www` shows wrong site or SSL error | Missing CNAME for `www` | Add CNAME → `cname.vercel-dns.com` |
-| Payment links use Vercel URL | `NEXT_PUBLIC_APP_URL` not set / not redeployed | Set to `https://tuxedoretreat.com` and redeploy |
-| Stripe redirect after pay goes to wrong host | Same as above + update Stripe webhook endpoint |
-
----
-
-## 6. Production test checklist
-
-After deploy + DNS + env vars:
-
-- [ ] `https://tuxedoretreat.com` loads homepage; browser address stays on custom domain
-- [ ] `https://www.tuxedoretreat.com` redirects to apex (308)
-- [ ] `https://warwick-bethel-retreat.vercel.app` redirects to `https://tuxedoretreat.com` (308)
-- [ ] Page title / navbar / footer say **Tuxedo Retreat**
-- [ ] View source: canonical and `og:url` use `tuxedoretreat.com`
-- [ ] `https://tuxedoretreat.com/sitemap.xml` — all URLs on `tuxedoretreat.com`
-- [ ] `https://tuxedoretreat.com/robots.txt` — sitemap points to `tuxedoretreat.com`
-- [ ] `/book` — form, stay package selector, live quote, submit (check admin for new reservation)
-- [ ] Network tab on `/book` — API calls go to `/api/booking/*` on same host (no localhost, no port 5002, no external Render rewrite)
-- [ ] `/admin/login` works; payment copy link uses `https://tuxedoretreat.com/reservations/.../payment`
-- [ ] Stripe test payment → success URL on `tuxedoretreat.com`
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| `tuxedoretreat.com` → `.vercel.app` | Vercel primary domain is still `.vercel.app` | Set primary to `tuxedoretreat.com` |
+| `tuxedoretreat.com` 403 / wrong site | DNS not on Vercel (`dig` shows AWS IPs) | A record → `76.76.21.21` |
+| `/` on `.vercel.app` → `warwick.bethel.retreat.vercel.app` | Vercel domain alias / redirect | Set primary domain; remove extra redirects |
+| Sitemap shows `.vercel.app` | Old deploy or missing env | Set `NEXT_PUBLIC_APP_URL`, redeploy |
+| Stripe return URL wrong | Same | Same |

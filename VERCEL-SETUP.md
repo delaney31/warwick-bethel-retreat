@@ -1,30 +1,35 @@
-# Vercel — Warwick Bethel Retreat
+# Vercel — Tuxedo Retreat
 
 **Project:** [warwick-bethel-retreat](https://vercel.com/delaney31s-projects/warwick-bethel-retreat)  
-**Production URL:** https://warwick-bethel-retreat.vercel.app  
-**API (Render):** https://warwick-bethel-retreat.onrender.com
+**Canonical production URL:** https://tuxedoretreat.com  
+**Legacy deployment URL:** https://warwick-bethel-retreat.vercel.app (redirects to canonical)
 
-## Required environment variables
+See **[DOMAIN-SETUP.md](./DOMAIN-SETUP.md)** for DNS, primary domain, and redirect fixes.
 
-Vercel → **Settings** → **Environment Variables** → **Production**:
+## Production environment variables
 
-| Name | Value |
-|------|--------|
-| `NEXT_PUBLIC_API_BASE_URL` | `https://warwick-bethel-retreat.onrender.com` |
-| `INTERNAL_API_URL` | `https://warwick-bethel-retreat.onrender.com` |
-| `NEXT_PUBLIC_APP_URL` | `https://warwick-bethel-retreat.vercel.app` |
-| `NEXT_PUBLIC_APP_NAME` | `Warwick Bethel Retreat` |
+| Variable | Value |
+|----------|--------|
+| `DATABASE_URL` | Neon pooled URL |
+| `NEXT_PUBLIC_APP_URL` | `https://tuxedoretreat.com` |
+| `NEXT_PUBLIC_APP_NAME` | `Tuxedo Retreat` |
+| `ADMIN_PASSWORD` | Your host password |
+| `STRIPE_SECRET_KEY` | Stripe secret key |
+| `STRIPE_WEBHOOK_SECRET` | `whsec_...` for `https://tuxedoretreat.com/api/stripe/webhook` |
 
-After saving, **Redeploy** production (Deployments → ⋯ → Redeploy).
+## Git
 
-## Connect Git (if not done)
+**Settings → Git** → `delaney31/warwick-bethel-retreat`, branch `main`, root directory `.`
 
-**Settings** → **Git** → connect `delaney31/warwick-bethel-retreat`, branch `main`, root directory `.`
+## Verify after deploy
 
-## Verify
+```bash
+./scripts/verify-production-domain.sh
+```
 
-1. Open https://warwick-bethel-retreat.vercel.app/book — calendar loads
-2. Open https://warwick-bethel-retreat.vercel.app/admin/login — admin works
-3. Admin: `admin@warwickbethelretreat.com` + password from local `.env.deploy` (`ADMIN_SEED_PASSWORD`)
+Manual:
 
-Render `FRONTEND_URL` is set to your Vercel URL for CORS.
+1. https://tuxedoretreat.com — loads, address bar stays on custom domain
+2. https://www.tuxedoretreat.com — redirects to apex
+3. https://tuxedoretreat.com/book — form + quote API on same host
+4. https://tuxedoretreat.com/admin/login — host dashboard

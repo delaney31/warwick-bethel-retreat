@@ -1,25 +1,38 @@
 import type { NextRequest } from "next/server";
-import { CANONICAL_HOST, getCanonicalSiteUrl, LEGACY_REDIRECT_HOSTS } from "@/lib/content/brand";
+import {
+  CANONICAL_HOST,
+  CANONICAL_SITE_URL,
+  getCanonicalSiteUrl,
+  LEGACY_REDIRECT_HOSTS,
+} from "@/lib/content/brand";
 
-/** Redirect www and legacy Vercel hosts to the canonical production URL. */
+function normalizeHost(host: string): string {
+  return host.toLowerCase().split(":")[0];
+}
+
+function isLegacyOrWwwHost(host: string, canonicalHost: string): boolean {
+  if (host === canonicalHost) return false;
+  if (host === `www.${canonicalHost}`) return true;
+  if (LEGACY_REDIRECT_HOSTS.includes(host as (typeof LEGACY_REDIRECT_HOSTS)[number])) {
+    return true;
+  }
+  if (host.endsWith(".vercel.app")) return true;
+  return false;
+}
+
+/** Redirect www, legacy Vercel hosts, and misconfigured hosts to https://tuxedoretreat.com. */
 export function getCanonicalRedirectUrl(request: NextRequest): URL | null {
-  const host = request.headers.get("host")?.toLowerCase().split(":")[0] ?? "";
+  const host = normalizeHost(request.headers.get("host") ?? "");
   if (!host || host === "localhost" || host.endsWith(".localhost")) {
     return null;
   }
 
-  const canonical = new URL(getCanonicalSiteUrl());
-  const canonicalHost = canonical.hostname.toLowerCase();
+  const canonicalHost = CANONICAL_HOST;
+  const canonicalBase = getCanonicalSiteUrl() || CANONICAL_SITE_URL;
 
-  const shouldRedirect =
-    host === `www.${canonicalHost}` ||
-    LEGACY_REDIRECT_HOSTS.includes(host as (typeof LEGACY_REDIRECT_HOSTS)[number]) ||
-    (host.endsWith(".vercel.app") && host !== canonicalHost);
-
-  if (!shouldRedirect || host === canonicalHost) {
+  if (!isLegacyOrWwwHost(host, canonicalHost)) {
     return null;
   }
 
-  const dest = new URL(request.nextUrl.pathname + request.nextUrl.search, canonical);
-  return dest;
+  return new URL(request.nextUrl.pathname + request.nextUrl.search, canonicalBase);
 }

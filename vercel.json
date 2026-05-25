@@ -16,6 +16,12 @@
       "has": [{ "type": "host", "value": "warwick-bethel-retreat.vercel.app" }],
       "destination": "https://tuxedoretreat.com/:path*",
       "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "warwick.bethel.retreat.vercel.app" }],
+      "destination": "https://tuxedoretreat.com/:path*",
+      "permanent": true
     }
   ]
 }

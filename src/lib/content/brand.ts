@@ -1,6 +1,8 @@
 /** Canonical production domain (no trailing slash). */
 export const CANONICAL_HOST = "tuxedoretreat.com";
 
+export const CANONICAL_SITE_URL = `https://${CANONICAL_HOST}`;
+
 export const SITE_NAME = "Tuxedo Retreat";
 
 export const SITE_TAGLINE = "Luxury nightly stay near Warwick Bethel";
@@ -17,18 +19,41 @@ export const HERO_HEADLINE = "A peaceful luxury stay minutes from Warwick Bethel
 export const HERO_SUBHEADLINE =
   "Tuxedo Retreat offers two serene bedrooms, wooded views, and warm private hosting for Bethel visitors who want comfort after full days at Warwick.";
 
-/** Hosts that should 308-redirect to the canonical site (set in Vercel + middleware). */
+/** Vercel deployment hostnames that must 308 to the canonical site. */
 export const LEGACY_REDIRECT_HOSTS = [
   "warwick-bethel-retreat.vercel.app",
+  "warwick.bethel.retreat.vercel.app",
   "www.tuxedoretreat.com",
 ] as const;
 
+/** Vercel apex A record — use for DNS verification. */
+export const VERCEL_APEX_A_RECORD = "76.76.21.21";
+
+/** Vercel DNS CNAME target for www and ALIAS apex. */
+export const VERCEL_DNS_CNAME = "cname.vercel-dns.com";
+
+function isProductionDeploy(): boolean {
+  return (
+    process.env.VERCEL_ENV === "production" ||
+    (process.env.NODE_ENV === "production" && process.env.VERCEL === "1")
+  );
+}
+
+/**
+ * Canonical public site URL for metadata, Stripe, sitemap, and payment links.
+ * In production, never returns a *.vercel.app URL even if env is misconfigured.
+ */
 export function getCanonicalSiteUrl(): string {
   const fromEnv = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "");
-  if (fromEnv) return fromEnv;
-  if (process.env.NODE_ENV === "production") {
-    return `https://${CANONICAL_HOST}`;
+
+  if (isProductionDeploy()) {
+    if (fromEnv && !fromEnv.includes(".vercel.app")) {
+      return fromEnv;
+    }
+    return CANONICAL_SITE_URL;
   }
+
+  if (fromEnv) return fromEnv;
   return "http://localhost:3000";
 }
 
