@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { SITE_NAME } from "@/lib/content/brand";
 import {
   ReservationDbStatus,
   getReservationById,
@@ -28,7 +29,7 @@ function buildLineItems(
         currency: "usd",
         unit_amount: amountCents,
         product_data: {
-          name: "Warwick Bethel Retreat",
+          name: SITE_NAME,
           description: `${reservation.roomPackageLabel} · ${reservation.nights} night${reservation.nights !== 1 ? "s" : ""} · ${reservation.checkIn} → ${reservation.checkOut} · ${reservation.guestCount} guest${reservation.guestCount !== 1 ? "s" : ""}`,
         },
       },

@@ -27,7 +27,7 @@ export function getPropertyImage(key: keyof typeof PROPERTY_IMAGES): string {
 }
 
 export const GALLERY_IMAGES = [
-  { src: "/images/property/hero.png", alt: "Warwick Bethel Retreat — luxury home exterior in a wooded setting", key: "hero" as const },
+  { src: "/images/property/hero.png", alt: "Tuxedo Retreat — luxury home exterior in a wooded setting", key: "hero" as const },
   { src: "/images/property/living-vaulted.png", alt: "Vaulted studio living area with deck access and garden views", key: "living" as const },
   { src: "/images/property/living-studio.png", alt: "Bright studio suite with dining table, retro kitchenette, and hardwood floors", key: "living" as const },
   { src: "/images/property/bedroom-pink.png", alt: "Serene bedroom with premium bedding and woodland views", key: "bedroom" as const },

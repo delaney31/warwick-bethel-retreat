@@ -1,6 +1,6 @@
-# Warwick Bethel Retreat
+# Tuxedo Retreat
 
-Luxury nightly stay website — **15 minutes from Warwick Bethel**.
+Luxury nightly stay at **Tuxedo Retreat** — **15 minutes from Warwick Bethel**.
 
 | Layer | Technology |
 |-------|------------|

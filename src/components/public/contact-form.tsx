@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { FormField } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
+import { SITE_NAME } from "@/lib/content/brand";
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "success">("idle");
@@ -10,11 +11,11 @@ export function ContactForm() {
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
-    const subject = encodeURIComponent(String(form.get("subject") || "Warwick Bethel Retreat inquiry"));
+    const subject = encodeURIComponent(String(form.get("subject") || `${SITE_NAME} inquiry`));
     const body = encodeURIComponent(
       `Name: ${form.get("name")}\nEmail: ${form.get("email")}\nPhone: ${form.get("phone")}\n\n${form.get("message")}`,
     );
-    window.location.href = `mailto:bookings@warwickbethelretreat.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:bookings@tuxedoretreat.com?subject=${subject}&body=${body}`;
     setStatus("success");
   }
 

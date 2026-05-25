@@ -1,5 +1,6 @@
 import { PropertyImage } from "@/components/ui/property-image";
 import { PROPERTY_IMAGES } from "@/lib/content/property";
+import { SITE_NAME } from "@/lib/content/brand";
 import { Button } from "@/components/ui/button";
 
 const MOMENTS = [
@@ -30,7 +31,7 @@ export function ExperienceSection() {
               A retreat shaped for Bethel visitors who value peace
             </h2>
             <p className="mt-6 text-base leading-relaxed text-stone-600">
-              Warwick Bethel Retreat was imagined for guests who carry full schedules and deserve
+              {SITE_NAME} was imagined for guests who carry full schedules and deserve
               a home that feels considered — warm hardwood underfoot, generous windows onto the
               woods, and hosting that is personal, not automated.
             </p>

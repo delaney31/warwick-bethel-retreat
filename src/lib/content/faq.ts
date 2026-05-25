@@ -2,7 +2,7 @@ export const FAQ_ITEMS = [
   {
     question: "How far is the retreat from Warwick Bethel?",
     answer:
-      "Warwick Bethel Retreat is approximately 15 minutes from Warwick Bethel — ideal for convention visitors, couples, and families who want a peaceful nightly stay close to headquarters.",
+      "Tuxedo Retreat is approximately 15 minutes from Warwick Bethel — ideal for convention visitors, couples, and families who want a peaceful nightly stay close to headquarters.",
   },
   {
     question: "How does the reservation process work?",

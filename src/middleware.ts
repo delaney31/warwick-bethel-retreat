@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isAdminRequestAuthenticated } from "@/lib/admin/auth";
+import { getCanonicalRedirectUrl } from "@/lib/server/canonical-host";
 
 const PUBLIC_PATHS = [
   "/",
@@ -21,6 +22,11 @@ function isPublicPath(pathname: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
+  const canonicalRedirect = getCanonicalRedirectUrl(request);
+  if (canonicalRedirect) {
+    return NextResponse.redirect(canonicalRedirect, 308);
+  }
+
   const { pathname } = request.nextUrl;
 
   if (isPublicPath(pathname)) {

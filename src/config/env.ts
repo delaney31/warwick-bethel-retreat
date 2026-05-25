@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { getCanonicalSiteUrl, SITE_NAME } from "@/lib/content/brand";
 
 const clientSchema = z.object({
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().startsWith("pk_").optional(),
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
-  NEXT_PUBLIC_APP_NAME: z.string().default("Warwick Bethel Retreat"),
+  NEXT_PUBLIC_APP_NAME: z.string().default(SITE_NAME),
 });
 
 const serverSchema = z.object({
@@ -46,7 +47,5 @@ export const clientEnv = getClientEnv();
 export { getServerEnv };
 
 export function getAppUrl(): string {
-  if (clientEnv.NEXT_PUBLIC_APP_URL) return clientEnv.NEXT_PUBLIC_APP_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "http://localhost:3000";
+  return getCanonicalSiteUrl();
 }

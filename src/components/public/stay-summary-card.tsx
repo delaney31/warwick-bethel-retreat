@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { Bath, BedDouble, Calendar, Check, MapPin, Shield, Trees } from "lucide-react";
+import { SITE_NAME } from "@/lib/content/brand";
 import type { BookingQuote } from "@/lib/api/booking-public";
 import { isStayPackageId, getStayPackageLabel } from "@/lib/pricing/stay-packages";
 import { formatCurrency } from "@/lib/validation/booking";
@@ -61,7 +62,7 @@ export function StaySummaryCard({
           <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-amber-400/90">
             Stay summary
           </p>
-          <h2 className="mt-2 font-serif text-2xl font-light tracking-tight">Warwick Bethel Retreat</h2>
+          <h2 className="mt-2 font-serif text-2xl font-light tracking-tight">{SITE_NAME}</h2>
           <p className="mt-1 text-sm text-white/50">1.5 bathrooms · woodland setting</p>
         </div>
 

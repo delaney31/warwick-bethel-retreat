@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { PropertyImage } from "@/components/ui/property-image";
 import { AMENITIES, PROPERTY_IMAGES } from "@/lib/content/property";
+import { pageMetadata } from "@/lib/content/site-metadata";
 import { Button } from "@/components/ui/button";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Rooms & Amenities",
-  description: "2 bedrooms, 1.5 baths, wooded deck, coffee station — luxury cottage near Warwick Bethel.",
-};
+  description:
+    "Two bedrooms, 1.5 baths, wooded deck, coffee station — luxury cottage at Tuxedo Retreat near Warwick Bethel.",
+  path: "/rooms",
+});
 
 export default function RoomsPage() {
   return (

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SITE_NAME } from "@/lib/content/brand";
 
 export function Footer() {
   return (
@@ -7,7 +8,7 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-400">
-              Warwick Bethel Retreat
+              {SITE_NAME}
             </p>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-stone-400">
               A quiet luxury cottage fifteen minutes from Warwick Bethel — curated for
@@ -46,7 +47,7 @@ export function Footer() {
           </div>
         </div>
         <p className="mt-12 border-t border-stone-800 pt-8 text-center text-xs text-stone-600">
-          © {new Date().getFullYear()} Warwick Bethel Retreat. All rights reserved.
+          © {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
         </p>
       </div>
     </footer>

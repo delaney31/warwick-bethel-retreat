@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { AvailabilityCalendar } from "@/components/public/availability-calendar";
+import { pageMetadata } from "@/lib/content/site-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Availability",
   description:
-    "Live availability from our reservation database — see open, pending, approved, booked, and blocked dates.",
-};
+    "Live availability for Tuxedo Retreat — open, pending, approved, booked, and blocked dates near Warwick Bethel.",
+  path: "/availability",
+});
 
 export default function AvailabilityPage() {
   return (

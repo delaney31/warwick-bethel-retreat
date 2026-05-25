@@ -1,5 +1,6 @@
 import { PropertyImage } from "@/components/ui/property-image";
 import { PROPERTY_IMAGES } from "@/lib/content/property";
+import { SITE_NAME } from "@/lib/content/brand";
 import { Button } from "@/components/ui/button";
 
 export function FinalCtaSection() {
@@ -19,7 +20,7 @@ export function FinalCtaSection() {
 
       <div className="relative mx-auto max-w-3xl px-4 text-center md:px-8">
         <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-amber-400/90">
-          Warwick Bethel Retreat
+          {SITE_NAME}
         </p>
         <h2 className="mt-5 font-serif text-3xl font-light leading-snug text-white md:text-5xl">
           Planning your Bethel visit? Request your dates today.

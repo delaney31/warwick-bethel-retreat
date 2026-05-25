@@ -12,6 +12,7 @@ import {
 } from "@/lib/api/booking-public";
 import { MAX_GUESTS } from "@/lib/constants";
 import { StayPackage, type StayPackageId } from "@/lib/pricing/stay-packages";
+import { SITE_NAME } from "@/lib/content/brand";
 import {
   validateBookingForm,
   todayISO,
@@ -180,7 +181,7 @@ function BookingRequestFormInner() {
       addReservation({
         id: result.id,
         vehicleId: "",
-        vehicleDisplayName: "Warwick Bethel Retreat",
+        vehicleDisplayName: SITE_NAME,
         status: ReservationStatus.PendingReview,
         renterName: result.guestName,
         email: form.guestEmail,

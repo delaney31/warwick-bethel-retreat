@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { FaqAccordion } from "@/components/public/faq-accordion";
+import { pageMetadata } from "@/lib/content/site-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "FAQ",
-};
+  description: "Rates, booking process, and stay details for Tuxedo Retreat near Warwick Bethel.",
+  path: "/faq",
+});
 
 export default function FaqPage() {
   return (

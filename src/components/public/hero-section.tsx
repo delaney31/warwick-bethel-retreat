@@ -3,6 +3,12 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { PropertyImage } from "@/components/ui/property-image";
+import {
+  HERO_EYEBROW,
+  HERO_HEADLINE,
+  HERO_SUBHEADLINE,
+  SITE_NAME,
+} from "@/lib/content/brand";
 import { PROPERTY_IMAGES } from "@/lib/content/property";
 
 export function HeroSection() {
@@ -11,7 +17,7 @@ export function HeroSection() {
       <div className="absolute inset-0">
         <PropertyImage
           src={PROPERTY_IMAGES.hero}
-          alt="Warwick Bethel Retreat — luxury home in a quiet wooded setting"
+          alt={`${SITE_NAME} — luxury home in a quiet wooded setting`}
           imageKey="hero"
           fill
           priority
@@ -29,14 +35,13 @@ export function HeroSection() {
         className="relative z-10 mx-auto w-full max-w-7xl px-4 md:px-8"
       >
         <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-amber-400/95">
-          Warwick Bethel Retreat · Luxury nightly stay
+          {HERO_EYEBROW}
         </p>
         <h1 className="mt-5 max-w-4xl font-serif text-4xl font-light leading-[1.06] tracking-tight text-white md:text-6xl lg:text-[3.5rem]">
-          A peaceful luxury stay minutes from Warwick Bethel
+          {HERO_HEADLINE}
         </h1>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/72 md:text-lg md:leading-relaxed">
-          Two serene bedrooms, wooded views, and warm private hosting for Bethel visitors who want
-          comfort after full days at Warwick.
+          {HERO_SUBHEADLINE}
         </p>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Button href="/book" size="lg">

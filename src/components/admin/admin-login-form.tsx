@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { adminLogin } from "@/lib/admin/api";
+import { SITE_NAME } from "@/lib/content/brand";
 import { FormField } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
 
@@ -38,8 +39,8 @@ export function AdminLoginForm() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-stone-400">
             Private host access
           </p>
-          <h1 className="mt-3 font-serif text-3xl font-light">Warwick Bethel</h1>
-          <p className="mt-2 text-sm text-stone-400">Retreat command center</p>
+          <h1 className="mt-3 font-serif text-3xl font-light">{SITE_NAME}</h1>
+          <p className="mt-2 text-sm text-stone-400">Host command center</p>
         </div>
         <div className="space-y-5 px-8 py-8">
           <FormField

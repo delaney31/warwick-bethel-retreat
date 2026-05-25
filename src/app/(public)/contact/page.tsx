@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/public/contact-form";
+import { pageMetadata } from "@/lib/content/site-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contact",
-};
+  description: "Contact the host at Tuxedo Retreat — questions before booking your stay near Warwick Bethel.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

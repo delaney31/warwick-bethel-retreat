@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SITE_NAME } from "@/lib/content/brand";
 
 export function PaymentShell({
   eyebrow,
@@ -37,7 +38,7 @@ export function PaymentShell({
           href="/"
           className="text-sm text-sage-700 underline-offset-4 hover:underline dark:text-amber-400"
         >
-          Return to Warwick Bethel Retreat
+          Return to {SITE_NAME}
         </Link>
       </p>
     </div>

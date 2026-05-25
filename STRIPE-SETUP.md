@@ -1,4 +1,4 @@
-# Stripe Checkout — Warwick Bethel Retreat
+# Stripe Checkout — Tuxedo Retreat
 
 ## Payment flow
 
@@ -13,7 +13,7 @@
 ```env
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=https://tuxedoretreat.com
 ```
 
 On Vercel, set the same in Production. `NEXT_PUBLIC_APP_URL` must match your live domain for success/cancel redirects.

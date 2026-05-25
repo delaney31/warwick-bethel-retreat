@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { SITE_NAME } from "@/lib/content/brand";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
 
@@ -22,7 +23,7 @@ export function Navbar() {
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-stone-950/70 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
         <Link href="/" className="text-sm font-semibold tracking-[0.2em] text-white uppercase">
-          Warwick Bethel Retreat
+          {SITE_NAME}
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

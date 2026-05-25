@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { getCanonicalSiteUrl } from "@/lib/content/brand";
 
 let stripeSingleton: Stripe | null = null;
 
@@ -14,8 +15,7 @@ export function getStripe(): Stripe {
 }
 
 export function getAppOrigin(): string {
-  const url = process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000";
-  return url.replace(/\/$/, "");
+  return getCanonicalSiteUrl();
 }
 
 export function getWebhookSecret(): string {

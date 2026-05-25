@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { ImageGallery } from "@/components/public/image-gallery";
+import { pageMetadata } from "@/lib/content/site-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Gallery",
-  description: "Cinematic gallery — vaulted ceilings, wooded deck, premium interiors.",
-};
+  description: "Gallery of Tuxedo Retreat — vaulted ceilings, wooded deck, premium interiors near Warwick Bethel.",
+  path: "/gallery",
+});
 
 export default function GalleryPage() {
   return (

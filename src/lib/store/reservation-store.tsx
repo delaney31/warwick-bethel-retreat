@@ -60,7 +60,7 @@ function saveToStorage(reservations: Reservation[]) {
 
 // ── Allowed admin transitions ───────────────────────────────
 
-/** Warwick Bethel Retreat — simplified approval flow (matches API ProductLine=Retreat). */
+/** Tuxedo Retreat — simplified approval flow. */
 const ADMIN_TRANSITIONS: Partial<Record<ReservationStatus, ReservationStatus[]>> = {
   [ReservationStatus.PendingReview]: [
     ReservationStatus.AwaitingPayment,

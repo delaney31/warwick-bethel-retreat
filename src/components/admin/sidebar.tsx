@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, CalendarDays, LogOut } from "lucide-react";
 import { adminLogout } from "@/lib/admin/api";
+import { SITE_NAME } from "@/lib/content/brand";
 import { cn } from "@/lib/utils/cn";
 
 const NAV = [
@@ -25,7 +26,7 @@ export function AdminSidebar() {
     <aside className="flex w-full shrink-0 flex-col border-b border-stone-200/80 bg-stone-900 text-stone-300 md:w-60 md:border-b-0 md:border-r">
       <div className="px-5 py-6 md:px-4">
         <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-stone-500">Host</p>
-        <p className="mt-2 font-serif text-lg font-light text-white">Warwick Bethel</p>
+        <p className="mt-2 font-serif text-lg font-light text-white">{SITE_NAME}</p>
       </div>
       <nav className="flex gap-1 px-3 pb-3 md:flex-col md:px-3 md:pb-0">
         {NAV.map((item) => {

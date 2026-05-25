@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BookingRequestForm } from "@/components/public/booking-request-form";
+import { pageMetadata } from "@/lib/content/site-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Reserve Your Stay",
   description:
-    "Request your stay at Warwick Bethel Retreat — host-reviewed reservations, secure payment after approval.",
-};
+    "Request your stay at Tuxedo Retreat — host-reviewed reservations, secure payment after approval.",
+  path: "/book",
+});
 
 export default function BookPage() {
   return (

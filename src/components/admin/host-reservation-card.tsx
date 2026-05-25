@@ -21,6 +21,7 @@ import {
   updateHostReservationStatus,
   type HostReservation,
 } from "@/lib/admin/api";
+import { getCanonicalSiteUrl } from "@/lib/content/brand";
 import { ReservationDbStatus } from "@/lib/reservations/status";
 import { HostStatusBadge } from "@/components/admin/host-status-badge";
 import { formatCurrency } from "@/lib/validation/booking";
@@ -166,7 +167,7 @@ export function HostReservationCard({
                     const data = await approveHostReservation(reservation.id);
                     setStripeCheckoutUrl(data.checkoutUrl);
                     setGuestPaymentUrl(
-                      `${window.location.origin}/reservations/${reservation.id}/payment`,
+                      `${getCanonicalSiteUrl()}/reservations/${reservation.id}/payment`,
                     );
                     if (data.reservation) onUpdated(data.reservation);
                   } catch (e) {
@@ -220,7 +221,7 @@ export function HostReservationCard({
                     const data = await createHostCheckoutSession(reservation.id);
                     setStripeCheckoutUrl(data.checkoutUrl);
                     setGuestPaymentUrl(
-                      `${window.location.origin}/reservations/${reservation.id}/payment`,
+                      `${getCanonicalSiteUrl()}/reservations/${reservation.id}/payment`,
                     );
                     if (data.reservation) onUpdated(data.reservation);
                   } catch (e) {
