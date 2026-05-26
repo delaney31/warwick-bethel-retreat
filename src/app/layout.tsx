@@ -1,5 +1,6 @@
 import type { Viewport } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { ReservationStoreProvider } from "@/lib/store/reservation-store";
 import { rootMetadata } from "@/lib/content/site-metadata";
 import "./globals.css";
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${sans.variable} ${serif.variable}`}>
       <body className="min-h-dvh font-sans antialiased">
         <ReservationStoreProvider>{children}</ReservationStoreProvider>
+        <Analytics />
       </body>
     </html>
   );
