@@ -15,6 +15,7 @@ import {
   serializeReservation,
   type PublicCalendarPayload,
 } from "@/lib/reservations";
+import { notifyHostNewBookingRequest } from "@/lib/sms/notify-booking-request";
 
 export const BOOKING_BASE_RATE = 150;
 export const BOOKING_TWO_BEDROOM_RATE = 200;
@@ -227,6 +228,16 @@ export async function createRetreatReservation(
           "We couldn't submit your request. Please check your details and try again.",
       };
     }
+
+    void notifyHostNewBookingRequest({
+      guestName: row.guestName,
+      phone: payload.guestPhone,
+      checkIn: row.checkIn,
+      checkOut: row.checkOut,
+      nights: row.nights,
+      guestCount: row.guestCount,
+      roomPackage: row.roomPackage,
+    });
 
     return {
       id: row.id,
