@@ -23,22 +23,22 @@ export function FinalCtaSection() {
           {SITE_NAME}
         </p>
         <h2 className="mt-5 font-serif text-3xl font-light leading-snug text-white md:text-5xl">
-          Planning your Bethel visit? Request your dates today.
+          Ready for peaceful lodging near Warwick Bethel?
         </h2>
         <p className="mx-auto mt-6 max-w-lg text-sm leading-relaxed text-white/60">
-          Submit a reservation request when you are ready. Your host will review your stay and
-          invite you to secure payment only after approval.
+          Submit a reservation request for your Bethel dates — your host reviews each stay
+          personally and invites secure payment only after approval.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button href="/book" size="lg">
             Request Your Stay
           </Button>
           <Button
-            href="/availability"
+            href="/rooms"
             size="lg"
             className="border-white/20 bg-transparent text-white hover:bg-white/10"
           >
-            Check availability
+            View rooms
           </Button>
         </div>
       </div>

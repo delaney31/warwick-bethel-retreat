@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CalendarCheck, CreditCard, FileText, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -65,10 +66,19 @@ export function BookingFlowSection() {
           })}
         </ol>
 
-        <div className="mt-14 flex justify-center">
+        <div className="mt-14 flex flex-col items-center gap-4">
           <Button href="/book" size="lg">
             Request Your Stay
           </Button>
+          <p className="text-center text-sm text-white/45">
+            <Link href="/availability" className="text-amber-300/80 hover:text-amber-200">
+              Check the live calendar
+            </Link>
+            {" · "}
+            <Link href="/faq" className="text-amber-300/80 hover:text-amber-200">
+              FAQ
+            </Link>
+          </p>
         </div>
       </div>
     </section>

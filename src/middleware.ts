@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isAdminRequestAuthenticated } from "@/lib/admin/auth";
+import { isSeoLandingSlug } from "@/lib/content/seo-landings";
 import { getCanonicalRedirectUrl } from "@/lib/server/canonical-host";
 
 const PUBLIC_PATHS = [
@@ -10,6 +11,7 @@ const PUBLIC_PATHS = [
   "/book",
   "/faq",
   "/contact",
+  "/guides",
   "/reservations",
   "/api/booking",
   "/api/reservations",
@@ -18,6 +20,12 @@ const PUBLIC_PATHS = [
 ];
 
 function isPublicPath(pathname: string): boolean {
+  if (pathname.length > 1) {
+    const slug = pathname.slice(1).split("/")[0];
+    if (slug && pathname === `/${slug}` && isSeoLandingSlug(slug)) {
+      return true;
+    }
+  }
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
@@ -66,3 +74,4 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|images/|robots\\.txt|sitemap\\.xml|googlec00b9150749578dc\\.html).*)",
   ],
 };
+

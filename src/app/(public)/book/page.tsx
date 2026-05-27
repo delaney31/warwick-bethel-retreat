@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BookingRequestForm } from "@/components/public/booking-request-form";
 import { pageMetadata } from "@/lib/content/site-metadata";
+import { JsonLd } from "@/components/seo/json-ld";
+import {
+  breadcrumbSchema,
+  roomOffersSchema,
+  stayOfferSchema,
+} from "@/lib/seo/json-ld";
 
 export const metadata: Metadata = pageMetadata({
   title: "Reserve Your Stay",
@@ -13,6 +19,21 @@ export const metadata: Metadata = pageMetadata({
 export default function BookPage() {
   return (
     <div className="bg-gradient-to-b from-stone-100 via-stone-50 to-sage-50/30 pt-28 pb-24">
+      <JsonLd
+        data={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Book", path: "/book" },
+          ]),
+          roomOffersSchema(),
+          stayOfferSchema({
+            name: "Tuxedo Retreat nightly stay",
+            description: "Host-reviewed reservation request — payment after approval.",
+            price: 150,
+            url: "/book",
+          }),
+        ]}
+      />
       <div className="mx-auto max-w-6xl px-4 md:px-8">
         <div className="max-w-2xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-sage-600">

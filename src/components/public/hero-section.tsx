@@ -1,14 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { PropertyImage } from "@/components/ui/property-image";
-import {
-  HERO_EYEBROW,
-  HERO_HEADLINE,
-  HERO_SUBHEADLINE,
-  SITE_NAME,
-} from "@/lib/content/brand";
+import { SITE_NAME } from "@/lib/content/brand";
+import { HOMEPAGE_HERO, HOMEPAGE_SEO_LINKS } from "@/lib/content/homepage";
 import { PROPERTY_IMAGES } from "@/lib/content/property";
 
 export function HeroSection() {
@@ -17,7 +14,7 @@ export function HeroSection() {
       <div className="absolute inset-0">
         <PropertyImage
           src={PROPERTY_IMAGES.hero}
-          alt={`${SITE_NAME} — luxury home in a quiet wooded setting`}
+          alt={`${SITE_NAME} — peaceful lodging near Warwick Bethel in a wooded setting`}
           imageKey="hero"
           fill
           priority
@@ -35,29 +32,66 @@ export function HeroSection() {
         className="relative z-10 mx-auto w-full max-w-7xl px-4 md:px-8"
       >
         <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-amber-400/95">
-          {HERO_EYEBROW}
+          {HOMEPAGE_HERO.eyebrow}
         </p>
         <h1 className="mt-5 max-w-4xl font-serif text-4xl font-light leading-[1.06] tracking-tight text-white md:text-6xl lg:text-[3.5rem]">
-          {HERO_HEADLINE}
+          {HOMEPAGE_HERO.h1}
         </h1>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/72 md:text-lg md:leading-relaxed">
-          {HERO_SUBHEADLINE}
+          {HOMEPAGE_HERO.intro}
         </p>
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/55">
+          {HOMEPAGE_HERO.subintro}{" "}
+          <Link
+            href="/stay-near-warwick-bethel"
+            className="font-medium text-amber-300/90 underline-offset-4 hover:text-amber-200"
+          >
+            Stay near Warwick Bethel
+          </Link>{" "}
+          in a private{" "}
+          <Link
+            href="/tuxedo-park-ny-stay"
+            className="font-medium text-amber-300/90 underline-offset-4 hover:text-amber-200"
+          >
+            Tuxedo Park cottage
+          </Link>{" "}
+          — or choose a{" "}
+          <Link
+            href="/private-room-near-warwick-ny"
+            className="font-medium text-amber-300/90 underline-offset-4 hover:text-amber-200"
+          >
+            private room near Warwick, NY
+          </Link>{" "}
+          when traveling lightly.
+        </p>
+
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Button href="/book" size="lg">
             Request Your Stay
           </Button>
           <Button
-            href="/rooms"
+            href="/availability"
             size="lg"
             className="border-white/25 bg-white/10 text-white backdrop-blur-sm hover:bg-white/15"
           >
-            View Rooms
+            Check Availability
           </Button>
         </div>
-        <p className="mt-8 text-sm text-white/45">
-          Personally reviewed by your host · No payment until approved
-        </p>
+
+        <nav
+          aria-label="Visitor planning links"
+          className="mt-8 flex flex-wrap gap-2"
+        >
+          {HOMEPAGE_SEO_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/50 transition hover:border-amber-400/30 hover:text-amber-200/90"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
       </motion.div>
     </section>
   );

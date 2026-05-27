@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { AvailabilityCalendar } from "@/components/public/availability-calendar";
 import { pageMetadata } from "@/lib/content/site-metadata";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbSchema } from "@/lib/seo/json-ld";
 
 export const metadata: Metadata = pageMetadata({
   title: "Availability",
@@ -12,6 +14,12 @@ export const metadata: Metadata = pageMetadata({
 export default function AvailabilityPage() {
   return (
     <div className="bg-gradient-to-b from-stone-100 via-stone-50 to-sage-50/20 pt-28 pb-24">
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Availability", path: "/availability" },
+        ])}
+      />
       <div className="mx-auto max-w-4xl px-4 md:px-8">
         <p className="text-center text-[11px] font-semibold uppercase tracking-[0.35em] text-sage-600">
           Plan your retreat

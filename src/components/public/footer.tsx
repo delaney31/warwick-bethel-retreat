@@ -25,6 +25,10 @@ export function Footer() {
                 ["/gallery", "Gallery"],
                 ["/availability", "Availability"],
                 ["/book", "Reserve"],
+                ["/guides", "Guides"],
+                ["/faq", "FAQ"],
+                ["/lodging-near-warwick-bethel", "Lodging near Bethel"],
+                ["/bethel-visitor-guide", "Visitor guide"],
               ].map(([href, label]) => (
                 <li key={href}>
                   <Link href={href} className="hover:text-white transition">

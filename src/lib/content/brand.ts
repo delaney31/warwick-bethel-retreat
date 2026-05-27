@@ -7,10 +7,10 @@ export const SITE_NAME = "Tuxedo Retreat";
 
 export const SITE_TAGLINE = "Luxury nightly stay near Warwick Bethel";
 
-export const SITE_TITLE = "Tuxedo Retreat — Luxury Stay Near Warwick Bethel";
+export const SITE_TITLE = "Lodging Near Warwick Bethel | Tuxedo Retreat";
 
 export const SITE_DESCRIPTION =
-  "A quiet luxury nightly stay near Warwick Bethel with two bedrooms, wooded views, host-reviewed bookings, and secure payment after approval.";
+  "Lodging near Warwick Bethel at Tuxedo Retreat — peaceful Bethel visitor accommodation in Tuxedo, NY. Host-reviewed stays from $150/night, secure payment after approval.";
 
 export const HERO_EYEBROW = "Tuxedo Retreat · Luxury nightly stay near Warwick Bethel";
 

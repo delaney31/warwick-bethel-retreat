@@ -3,6 +3,8 @@ import { PropertyImage } from "@/components/ui/property-image";
 import { AMENITIES, PROPERTY_IMAGES } from "@/lib/content/property";
 import { pageMetadata } from "@/lib/content/site-metadata";
 import { Button } from "@/components/ui/button";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbSchema, roomOffersSchema } from "@/lib/seo/json-ld";
 
 export const metadata: Metadata = pageMetadata({
   title: "Rooms & Amenities",
@@ -14,6 +16,15 @@ export const metadata: Metadata = pageMetadata({
 export default function RoomsPage() {
   return (
     <div className="bg-stone-50 pt-28 pb-20">
+      <JsonLd
+        data={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Rooms", path: "/rooms" },
+          ]),
+          roomOffersSchema(),
+        ]}
+      />
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-sage-600">Accommodations</p>
         <h1 className="mt-3 font-serif text-4xl font-light text-stone-900 md:text-5xl">Rooms & Amenities</h1>

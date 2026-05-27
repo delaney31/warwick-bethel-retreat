@@ -4,12 +4,21 @@ import { useState } from "react";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { cn } from "@/lib/utils/cn";
 
-export function FaqAccordion() {
+export interface FaqAccordionItem {
+  question: string;
+  answer: string;
+}
+
+interface FaqAccordionProps {
+  items?: FaqAccordionItem[];
+}
+
+export function FaqAccordion({ items = FAQ_ITEMS }: FaqAccordionProps) {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
     <div className="divide-y divide-stone-200 rounded-2xl border border-stone-200 bg-white/80">
-      {FAQ_ITEMS.map((item, i) => (
+      {items.map((item, i) => (
         <div key={item.question}>
           <button
             type="button"
