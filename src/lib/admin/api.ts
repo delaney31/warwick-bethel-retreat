@@ -107,3 +107,33 @@ export interface HostPaymentLinks {
 export async function fetchHostPaymentLinks(id: string): Promise<HostPaymentLinks> {
   return adminFetch<HostPaymentLinks>(`/api/admin/reservations/${id}/payment-link`);
 }
+
+export interface HostCalendarBlock {
+  id: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function fetchCalendarBlocks(): Promise<HostCalendarBlock[]> {
+  return adminFetch<HostCalendarBlock[]>("/api/admin/calendar-blocks");
+}
+
+export async function createHostCalendarBlock(input: {
+  startDate: string;
+  endDate: string;
+  reason: string;
+}): Promise<HostCalendarBlock> {
+  return adminFetch<HostCalendarBlock>("/api/admin/calendar-blocks", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function deleteHostCalendarBlock(id: string): Promise<void> {
+  await adminFetch<{ ok: boolean }>(`/api/admin/calendar-blocks/${id}`, {
+    method: "DELETE",
+  });
+}
