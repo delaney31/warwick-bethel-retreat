@@ -1,6 +1,7 @@
 import type { Viewport } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ReservationStoreProvider } from "@/lib/store/reservation-store";
 import { rootMetadata } from "@/lib/content/site-metadata";
 import "./globals.css";
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh font-sans antialiased">
         <ReservationStoreProvider>{children}</ReservationStoreProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
