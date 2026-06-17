@@ -25,6 +25,7 @@ export interface HostReservation {
 export interface CheckoutSessionResult {
   checkoutUrl: string;
   sessionId: string;
+  guestPaymentUrl?: string;
   reservation?: HostReservation | null;
 }
 

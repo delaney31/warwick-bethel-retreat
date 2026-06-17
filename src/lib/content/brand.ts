@@ -32,29 +32,33 @@ export const VERCEL_APEX_A_RECORD = "76.76.21.21";
 /** Vercel DNS CNAME target for www and ALIAS apex. */
 export const VERCEL_DNS_CNAME = "cname.vercel-dns.com";
 
-function isProductionDeploy(): boolean {
-  return (
-    process.env.VERCEL_ENV === "production" ||
-    (process.env.NODE_ENV === "production" && process.env.VERCEL === "1")
-  );
+function isLegacyDeployUrl(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    if (host.endsWith(".vercel.app")) return true;
+    if (host === `www.${CANONICAL_HOST}`) return true;
+    return LEGACY_REDIRECT_HOSTS.includes(host as (typeof LEGACY_REDIRECT_HOSTS)[number]);
+  } catch {
+    return true;
+  }
 }
 
 /**
  * Canonical public site URL for metadata, Stripe, sitemap, and payment links.
- * In production, never returns a *.vercel.app URL even if env is misconfigured.
+ * Never returns a *.vercel.app URL — works in the browser and on the server.
  */
 export function getCanonicalSiteUrl(): string {
   const fromEnv = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "");
 
-  if (isProductionDeploy()) {
-    if (fromEnv && !fromEnv.includes(".vercel.app")) {
-      return fromEnv;
-    }
+  if (fromEnv && !isLegacyDeployUrl(fromEnv)) {
+    return fromEnv;
+  }
+
+  if (process.env.NODE_ENV === "production") {
     return CANONICAL_SITE_URL;
   }
 
-  if (fromEnv) return fromEnv;
-  return "http://localhost:3000";
+  return fromEnv || "http://localhost:3000";
 }
 
 export function pageTitle(segment?: string): string {

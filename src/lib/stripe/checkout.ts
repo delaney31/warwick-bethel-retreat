@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { SITE_NAME } from "@/lib/content/brand";
+import { CANONICAL_HOST, SITE_NAME } from "@/lib/content/brand";
 import {
   ReservationDbStatus,
   getReservationById,
@@ -17,6 +17,19 @@ function paymentUrls(reservationId: string) {
     success_url: `${base}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${base}/cancel`,
   };
+}
+
+function sessionUsesCanonicalRedirects(session: Stripe.Checkout.Session): boolean {
+  try {
+    const canonical = CANONICAL_HOST.toLowerCase();
+    const successHost = new URL(
+      (session.success_url ?? "").replace("{CHECKOUT_SESSION_ID}", "x"),
+    ).hostname.toLowerCase();
+    const cancelHost = new URL(session.cancel_url ?? "").hostname.toLowerCase();
+    return successHost === canonical && cancelHost === canonical;
+  } catch {
+    return false;
+  }
 }
 
 function buildLineItems(
@@ -47,7 +60,11 @@ async function tryReuseOpenSession(
   const existing = await stripe.checkout.sessions.retrieve(sessionId);
 
   if (existing.status === "open" && existing.url) {
-    if (existing.amount_total === expectedCents && existing.metadata?.reservationId === reservationId) {
+    if (
+      existing.amount_total === expectedCents
+      && existing.metadata?.reservationId === reservationId
+      && sessionUsesCanonicalRedirects(existing)
+    ) {
       return { checkoutUrl: existing.url, sessionId: existing.id };
     }
     await stripe.checkout.sessions.expire(sessionId);

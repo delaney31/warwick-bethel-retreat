@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdminRequest, AdminAuthError } from "@/lib/admin/auth";
 import { createReservationCheckoutSession } from "@/lib/stripe/checkout";
+import { getGuestPaymentPageUrl } from "@/lib/stripe/payment-links";
 
 export async function POST(
   request: NextRequest,
@@ -13,6 +14,7 @@ export async function POST(
     return NextResponse.json({
       checkoutUrl: result.checkoutUrl,
       sessionId: result.sessionId,
+      guestPaymentUrl: getGuestPaymentPageUrl(id),
       reservation: result.reservation,
     });
   } catch (err) {
