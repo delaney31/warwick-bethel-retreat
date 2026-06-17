@@ -231,12 +231,14 @@ export async function createRetreatReservation(
 
     void notifyHostNewBookingRequest({
       guestName: row.guestName,
+      guestEmail: payload.guestEmail,
       phone: payload.guestPhone,
       checkIn: row.checkIn,
       checkOut: row.checkOut,
       nights: row.nights,
       guestCount: row.guestCount,
       roomPackage: row.roomPackage,
+      reservationId: row.id,
     });
 
     return {

@@ -16,6 +16,7 @@ const serverSchema = z.object({
   ADMIN_PASSWORD: z.string().min(8).optional(),
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().email().optional(),
+  HOST_ALERT_EMAIL: z.string().email().optional(),
 });
 
 function getClientEnv() {
@@ -40,6 +41,7 @@ function getServerEnv() {
     ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
+    HOST_ALERT_EMAIL: process.env.HOST_ALERT_EMAIL,
   });
 }
 
