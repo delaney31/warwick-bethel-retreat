@@ -7,18 +7,55 @@ export interface SendEmailInput {
   text?: string;
 }
 
+export interface EmailConfigStatus {
+  hasResendApiKey: boolean;
+  hasFrom: boolean;
+  from: string | null;
+  hostAlertEmail: string;
+}
+
+function readResendApiKey(): string | undefined {
+  return (
+    process.env.RESEND_API_KEY?.trim() ||
+    process.env.Email__ResendApiKey?.trim() ||
+    undefined
+  );
+}
+
+function readEmailFrom(): string | undefined {
+  return (
+    process.env.EMAIL_FROM?.trim() ||
+    process.env.Email__From?.trim() ||
+    undefined
+  );
+}
+
+export function getEmailConfigStatus(): EmailConfigStatus {
+  const from = readEmailFrom();
+  return {
+    hasResendApiKey: Boolean(readResendApiKey()),
+    hasFrom: Boolean(from),
+    from: from ?? null,
+    hostAlertEmail: resolveHostAlertEmail(),
+  };
+}
+
 /** Sends via Resend. Never throws — logs and returns success flag. */
 export async function sendEmail(input: SendEmailInput): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY?.trim();
-  const from = process.env.EMAIL_FROM?.trim();
+  const apiKey = readResendApiKey();
+  const from = readEmailFrom();
 
   if (!apiKey) {
-    console.info("[email] RESEND_API_KEY not set — skipping send.");
+    console.warn(
+      "[email] Resend API key not set — set RESEND_API_KEY on Vercel. Skipping send.",
+    );
     return false;
   }
 
   if (!from) {
-    console.warn("[email] EMAIL_FROM not set — skipping send.");
+    console.warn(
+      "[email] EMAIL_FROM not set — use e.g. Tuxedo Retreat <stays@pacificluxrentals.com>. Skipping send.",
+    );
     return false;
   }
 
@@ -46,6 +83,7 @@ export async function sendEmail(input: SendEmailInput): Promise<boolean> {
       return false;
     }
 
+    console.info(`[email] Sent to ${input.to} — ${input.subject}`);
     return true;
   } catch (err) {
     console.warn("[email] Resend exception:", err);
