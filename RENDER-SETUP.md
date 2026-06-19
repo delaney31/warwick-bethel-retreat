@@ -1,5 +1,7 @@
 # Render API — Warwick Bethel Retreat
 
+> **Note:** Production **tuxedoretreat.com** runs on **Vercel + Prisma** (`DATABASE_URL` on Vercel). This Render service is the **legacy .NET API**. You can **suspend** it to stop alerts if Vercel no longer points `NEXT_PUBLIC_API_BASE_URL` at Render.
+
 Service dashboard: [warwick-bethel-retreat on Render](https://dashboard.render.com/web/srv-d89s3abeo5us739694qg)
 
 **Public URL:** `https://warwick-bethel-retreat.onrender.com` (**.NET API**, Docker — not the Next.js site)
@@ -9,6 +11,21 @@ The frontend lives on **Vercel** (separate project, repo root). This Render serv
 Neon database is already migrated and seeded (project `sweet-mouse-40532596`).
 
 **Automate:** `./scripts/configure-render-deploy.sh` then `./scripts/verify-render-api.sh`
+
+## Neon compute quota errors
+
+If logs show:
+
+`Your account or project has exceeded the compute time quota`
+
+that is a **Neon billing/plan limit**, not an API bug. Retrying will not help until Neon accepts connections again.
+
+1. Open [Neon console](https://console.neon.tech) → project **warwick-bethel-retreat** (or the project behind `DATABASE_URL`).
+2. Check **Usage** / plan limits (free tier resets monthly; heavy use from Vercel + Render + local dev shares the same quota).
+3. **Fix:** upgrade Neon, wait for quota reset, or reduce usage (suspend this Render service if unused; avoid local scripts hitting prod DB repeatedly).
+4. After Neon is healthy, redeploy Render or run `./scripts/verify-render-api.sh`.
+
+Both **Vercel** (Prisma) and **Render** (EF Core) use the same Neon `DATABASE_URL` if configured that way — either being down affects the database project.
 
 ## Required environment variables
 

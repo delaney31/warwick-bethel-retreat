@@ -310,18 +310,40 @@ static bool IsTransientDatabaseException(Exception ex)
 {
     for (var current = ex; current != null; current = current.InnerException)
     {
-        if (current is NpgsqlException or System.Net.Sockets.SocketException or TimeoutException)
+        if (current is PostgresException pg)
+        {
+            if (IsNonRetryablePostgresError(pg))
+                return false;
+
+            // Transient Postgres states (admin restart, connection limits, etc.)
+            if (pg.SqlState is "57P01" or "53300" or "08006" or "08001" or "08003" or "40001")
+                return true;
+        }
+
+        if (current is System.Net.Sockets.SocketException or TimeoutException)
             return true;
 
         var message = current.Message;
+        if (message.Contains("compute time quota", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("exceeded the compute time quota", StringComparison.OrdinalIgnoreCase))
+            return false;
+
         if (message.Contains("timeout", StringComparison.OrdinalIgnoreCase) ||
-            message.Contains("connection", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("no route to host", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("transient", StringComparison.OrdinalIgnoreCase))
             return true;
     }
 
     return false;
+}
+
+static bool IsNonRetryablePostgresError(PostgresException pg)
+{
+    if (pg.SqlState == "XX000")
+        return true;
+
+    return pg.MessageText.Contains("compute time quota", StringComparison.OrdinalIgnoreCase) ||
+           pg.MessageText.Contains("exceeded the compute time quota", StringComparison.OrdinalIgnoreCase);
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
