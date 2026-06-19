@@ -1,6 +1,6 @@
 # Property photos
 
-Real retreat photography (12 images). Room assignments and filenames are defined in `src/lib/content/property.ts`.
+Real retreat photography (11 images). Room assignments and filenames are defined in `src/lib/content/property.ts`.
 
 ## Exterior (homepage hero + gallery)
 
@@ -13,8 +13,8 @@ Real retreat photography (12 images). Room assignments and filenames are defined
 
 | File | Scene |
 |------|--------|
-| `living-vaulted.png` | Vaulted living with deck door |
-| `living-studio.png` | Studio dining area |
+| `living-vaulted.png` | Vaulted living, studio dining, and deck door |
+| `kitchenette.png` | Mini fridge, microwave, and coffee station |
 | `bedroom-pink.png` | Queen bed, coral bedding, desk, woodland windows |
 | `bedroom-master.png` | Wide view — vaulted ceiling, deck door, reading chair |
 
@@ -22,7 +22,6 @@ Real retreat photography (12 images). Room assignments and filenames are defined
 
 | File | Scene |
 |------|--------|
-| `kitchenette.png` | Mini fridge & sideboard |
 | `coffee-station.png` | Keurig & console |
 | `bedroom-guest.png` | Grey full bed + floral twin daybed in one room |
 | `bedroom-window.png` | Grey full bed, armoire, forest views |

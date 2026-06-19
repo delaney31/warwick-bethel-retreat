@@ -25,12 +25,12 @@ export const PHOTO_ROOM_META: Record<
   "main-bedroom": {
     title: "Main bedroom",
     description:
-      "Private queen suite with vaulted living and studio dining — included in the $150/night main-bedroom package.",
+      "Private queen suite with vaulted living, studio dining, and kitchenette — included in the $150/night main-bedroom package.",
   },
   "second-bedroom": {
     title: "Second bedroom",
     description:
-      "Guest bedroom with grey full bed, twin/daybed, kitchenette, and coffee station — included when you book both bedrooms ($200/night package).",
+      "Guest bedroom with grey full bed, twin/daybed, and coffee station — included when you book both bedrooms ($200/night package).",
   },
 };
 
@@ -60,22 +60,15 @@ export const PROPERTY_PHOTOS: PropertyPhoto[] = [
     id: "living-vaulted",
     room: "main-bedroom",
     src: "/images/property/living-vaulted.png",
-    alt: "Main bedroom suite — vaulted living area with arched deck door and garden views",
-    caption: "Main bedroom · vaulted living area",
-  },
-  {
-    id: "living-studio",
-    room: "main-bedroom",
-    src: "/images/property/living-studio.png",
-    alt: "Main bedroom suite — studio dining area with hardwood floors",
-    caption: "Main bedroom · studio dining",
+    alt: "Main bedroom suite — vaulted living, studio dining, and deck door with garden views",
+    caption: "Main bedroom · living & dining",
   },
   {
     id: "kitchenette",
-    room: "second-bedroom",
+    room: "main-bedroom",
     src: "/images/property/kitchenette.png",
-    alt: "Second bedroom area — kitchenette with mini fridge and microwave",
-    caption: "Second bedroom · kitchenette",
+    alt: "Main bedroom suite — kitchenette with mini fridge, microwave, and coffee station",
+    caption: "Main bedroom · kitchenette",
   },
   {
     id: "main-bedroom-pink",
@@ -141,7 +134,6 @@ export const PROPERTY_IMAGES = {
   hero: "/images/property/hero.png",
   exteriorApproach: "/images/property/hero.png",
   living: "/images/property/living-vaulted.png",
-  livingStudio: "/images/property/living-studio.png",
   mainBedroom: "/images/property/bedroom-pink.png",
   mainBedroomWide: "/images/property/bedroom-master.png",
   secondBedroomBothBeds: "/images/property/bedroom-guest.png",
@@ -160,7 +152,6 @@ export const PROPERTY_IMAGE_FALLBACKS: Record<PropertyImageKey, string> = {
   hero: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=85",
   exteriorApproach: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=85",
   living: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=85",
-  livingStudio: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=85",
   mainBedroom: "https://images.unsplash.com/photo-1616594039914-ae87df899b07?w=1200&q=85",
   mainBedroomWide: "https://images.unsplash.com/photo-1600566753190-17f0baa8806c?w=1200&q=85",
   secondBedroomBothBeds: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=85",
@@ -176,7 +167,6 @@ const PHOTO_FALLBACK_KEY: Record<string, PropertyImageKey> = {
   hero: "hero",
   "outdoor-deck": "deck",
   "living-vaulted": "living",
-  "living-studio": "livingStudio",
   kitchenette: "kitchenette",
   "coffee-station": "coffeeStation",
   "main-bedroom-pink": "mainBedroom",
