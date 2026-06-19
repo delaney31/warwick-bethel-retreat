@@ -16,27 +16,26 @@ export const PHOTO_ROOM_META: Record<
 > = {
   exterior: {
     title: "Exterior & deck",
-    description: "Wooded setting and private outdoor space.",
+    description: "Property approach and private wooded deck.",
   },
   shared: {
-    title: "Shared living spaces",
-    description: "Vaulted studio, kitchenette, and areas both packages share.",
+    title: "Shared space",
+    description: "Legacy label — photos are grouped under main bedroom, second bedroom, or exterior.",
   },
   "main-bedroom": {
     title: "Main bedroom",
     description:
-      "Private queen suite with deck access, desk, and reading chair — the $150/night main-bedroom package.",
+      "Private queen suite with vaulted living and studio dining — included in the $150/night main-bedroom package.",
   },
   "second-bedroom": {
     title: "Second bedroom",
     description:
-      "Grey full bed plus twin/daybed — included when you book both bedrooms ($200/night package).",
+      "Guest bedroom with grey full bed, twin/daybed, kitchenette, and coffee station — included when you book both bedrooms ($200/night package).",
   },
 };
 
 export const GALLERY_SECTION_ORDER: PhotoRoom[] = [
   "exterior",
-  "shared",
   "main-bedroom",
   "second-bedroom",
 ];
@@ -46,44 +45,37 @@ export const PROPERTY_PHOTOS: PropertyPhoto[] = [
   {
     id: "hero",
     room: "exterior",
-    src: "/images/property/outdoor-deck.png",
-    alt: "Private wooded deck with Adirondack seating at Tuxedo Retreat",
-    caption: "Wooded deck — morning coffee before Bethel",
-  },
-  {
-    id: "exterior-approach",
-    room: "exterior",
     src: "/images/property/hero.png",
-    alt: "Tuxedo Retreat property in a wooded residential setting",
+    alt: "Tuxedo Retreat property approach in a wooded residential setting",
     caption: "Property approach",
   },
   {
+    id: "outdoor-deck",
+    room: "exterior",
+    src: "/images/property/outdoor-deck.png",
+    alt: "Private wooded deck with Adirondack seating overlooking the garden",
+    caption: "Wooded deck",
+  },
+  {
     id: "living-vaulted",
-    room: "shared",
+    room: "main-bedroom",
     src: "/images/property/living-vaulted.png",
-    alt: "Vaulted studio living area with arched deck door and garden views",
-    caption: "Vaulted living area",
+    alt: "Main bedroom suite — vaulted living area with arched deck door and garden views",
+    caption: "Main bedroom · vaulted living area",
   },
   {
     id: "living-studio",
-    room: "shared",
+    room: "main-bedroom",
     src: "/images/property/living-studio.png",
-    alt: "Studio dining area with retro kitchenette and hardwood floors",
-    caption: "Studio dining & kitchenette",
+    alt: "Main bedroom suite — studio dining area with hardwood floors",
+    caption: "Main bedroom · studio dining",
   },
   {
     id: "kitchenette",
-    room: "shared",
+    room: "second-bedroom",
     src: "/images/property/kitchenette.png",
-    alt: "Kitchenette with mini fridge, microwave, and coffee station",
-    caption: "Kitchenette",
-  },
-  {
-    id: "coffee-station",
-    room: "shared",
-    src: "/images/property/coffee-station.png",
-    alt: "Keurig coffee station and storage in the shared suite",
-    caption: "Coffee station",
+    alt: "Second bedroom area — kitchenette with mini fridge and microwave",
+    caption: "Second bedroom · kitchenette",
   },
   {
     id: "main-bedroom-pink",
@@ -98,6 +90,13 @@ export const PROPERTY_PHOTOS: PropertyPhoto[] = [
     src: "/images/property/bedroom-master.png",
     alt: "Main bedroom — vaulted queen suite with deck door and reading chair",
     caption: "Main bedroom · deck access",
+  },
+  {
+    id: "coffee-station",
+    room: "second-bedroom",
+    src: "/images/property/coffee-station.png",
+    alt: "Second bedroom area — Keurig coffee station and storage",
+    caption: "Second bedroom · coffee station",
   },
   {
     id: "second-bedroom-both-beds",
@@ -139,8 +138,7 @@ export function getPhotosByRoom(room: PhotoRoom): PropertyPhoto[] {
 
 /** Shorthand paths for hero, OG, and inline use. */
 export const PROPERTY_IMAGES = {
-  /** Wooded deck — primary hero/OG (matches cottage retreat copy). */
-  hero: "/images/property/outdoor-deck.png",
+  hero: "/images/property/hero.png",
   exteriorApproach: "/images/property/hero.png",
   living: "/images/property/living-vaulted.png",
   livingStudio: "/images/property/living-studio.png",
@@ -159,7 +157,7 @@ export type PropertyImageKey = keyof typeof PROPERTY_IMAGES;
 
 /** Unsplash fallbacks if a local file fails to load */
 export const PROPERTY_IMAGE_FALLBACKS: Record<PropertyImageKey, string> = {
-  hero: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cd7a?w=1920&q=85",
+  hero: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=85",
   exteriorApproach: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=85",
   living: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=85",
   livingStudio: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=85",
@@ -176,7 +174,6 @@ export const PROPERTY_IMAGE_FALLBACKS: Record<PropertyImageKey, string> = {
 
 const PHOTO_FALLBACK_KEY: Record<string, PropertyImageKey> = {
   hero: "hero",
-  "exterior-approach": "exteriorApproach",
   "outdoor-deck": "deck",
   "living-vaulted": "living",
   "living-studio": "livingStudio",

@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import { PropertyImage } from "@/components/ui/property-image";
 import {
   AMENITIES,
-  KITCHENETTE_NOTE,
   LAUNDRY_NOTE,
   PHOTO_ROOM_META,
-  PROPERTY_IMAGES,
   getPhotoFallbackKey,
   getPhotosByRoom,
 } from "@/lib/content/property";
@@ -61,7 +59,7 @@ export default function RoomsPage() {
         <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-sage-600">Accommodations</p>
         <h1 className="mt-3 font-serif text-4xl font-light text-stone-900 md:text-5xl">Rooms & Amenities</h1>
         <p className="mt-4 max-w-2xl text-stone-600">
-          Two distinct bedrooms plus shared living spaces. Photos below are grouped so you can see
+          Two distinct bedrooms with their own living areas. Photos below are grouped so you can see
           exactly what is included in the main-bedroom package versus the full two-bedroom cottage.
         </p>
 
@@ -72,7 +70,7 @@ export default function RoomsPage() {
           <h2 className="mt-2 font-serif text-3xl font-light text-stone-900">Main bedroom · $150/night</h2>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-stone-600">
             {PHOTO_ROOM_META["main-bedroom"].description} Queen bed with coral bedding, private desk,
-            reading chair, and direct access to the wooded deck through the vaulted living area.
+            reading chair, vaulted living, studio dining, and direct access to the wooded deck.
           </p>
           <RoomPhotoGrid room="main-bedroom" />
         </section>
@@ -91,46 +89,15 @@ export default function RoomsPage() {
           <RoomPhotoGrid room="second-bedroom" />
         </section>
 
-        <section className="mt-12">
+        <section className="mt-12 rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
           <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-stone-500">
-            {PHOTO_ROOM_META.shared.title}
+            {PHOTO_ROOM_META.exterior.title}
           </p>
-          <h2 className="mt-2 font-serif text-2xl font-light text-stone-900">Shared with both packages</h2>
+          <h2 className="mt-2 font-serif text-2xl font-light text-stone-900">Property approach & deck</h2>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-stone-600">
-            {PHOTO_ROOM_META.shared.description}
+            {PHOTO_ROOM_META.exterior.description} The deck connects to the main-bedroom living area.
           </p>
-          <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                src: PROPERTY_IMAGES.living,
-                key: "living" as const,
-                title: "Vaulted studio living",
-                desc: "Hardwood floors, garden views, and the arched door to the deck.",
-              },
-              {
-                src: PROPERTY_IMAGES.kitchenette,
-                key: "kitchenette" as const,
-                title: "Kitchenette",
-                desc: KITCHENETTE_NOTE,
-              },
-              {
-                src: PROPERTY_IMAGES.deck,
-                key: "deck" as const,
-                title: "Wooded deck",
-                desc: "Private Adirondack seating — morning coffee, evening calm.",
-              },
-            ].map((space) => (
-              <article key={space.title} className="overflow-hidden rounded-2xl bg-white shadow-lg">
-                <div className="relative aspect-[4/3]">
-                  <PropertyImage src={space.src} alt={space.title} imageKey={space.key} fill sizes="50vw" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-light text-stone-900">{space.title}</h3>
-                  <p className="mt-2 text-sm text-stone-600">{space.desc}</p>
-                </div>
-              </article>
-            ))}
-          </div>
+          <RoomPhotoGrid room="exterior" />
         </section>
 
         <div className="mt-16 rounded-2xl border border-stone-200 bg-white p-8">

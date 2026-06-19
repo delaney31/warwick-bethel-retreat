@@ -9,7 +9,7 @@ const PREVIEW_IDS = [
   { id: "main-bedroom-pink", span: "lg:col-span-4", aspect: "aspect-[4/3]" },
   { id: "second-bedroom-both-beds", span: "lg:col-span-4", aspect: "aspect-[4/3]" },
   { id: "main-bedroom-wide", span: "lg:col-span-6", aspect: "aspect-[16/10]" },
-  { id: "kitchenette", span: "lg:col-span-6", aspect: "aspect-[16/10]" },
+  { id: "coffee-station", span: "lg:col-span-6", aspect: "aspect-[16/10]" },
 ] as const;
 
 export function GalleryPreviewSection() {
@@ -27,7 +27,7 @@ export function GalleryPreviewSection() {
               Inside the retreat
             </p>
             <h2 className="mt-3 font-serif text-3xl font-light text-stone-900 md:text-4xl">
-              Main bedroom, second bedroom, and shared spaces
+              Main bedroom, second bedroom, and exterior
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-stone-600">
               Book the main bedroom alone, or reserve both bedrooms for your group. Photos are
