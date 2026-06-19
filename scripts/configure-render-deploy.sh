@@ -10,10 +10,9 @@ SERVICE_ID="${RENDER_SERVICE_ID:-srv-d89s3abeo5us739694qg}"
 API_URL="${RENDER_API_URL:-https://warwick-bethel-retreat.onrender.com}"
 
 if [[ -f "$ROOT/.env.deploy" ]]; then
-  # shellcheck disable=SC1091
   set -a
-  # shellcheck disable=SC1090
-  source <(grep -E '^(NEON_DATABASE_URL|JWT_SIGNING_KEY|ADMIN_SEED_PASSWORD|VERCEL_PRODUCTION_URL|RENDER_API_KEY)=' "$ROOT/.env.deploy" | sed 's/^/export /')
+  # shellcheck disable=SC1091
+  source "$ROOT/.env.deploy"
   set +a
 fi
 

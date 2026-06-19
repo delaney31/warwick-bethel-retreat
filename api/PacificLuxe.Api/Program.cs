@@ -17,6 +17,8 @@ using PacificLuxe.Api.Features.Reservations;
 using PacificLuxe.Api.Features.Vehicles;
 using PacificLuxe.Api.Configuration;
 using PacificLuxe.Api.Middleware;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -122,8 +124,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+// Render probes /health — keep it liveness-only so Neon cold starts do not fail the instance.
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<AppDbContext>("db");
+    .AddCheck("live", () => HealthCheckResult.Healthy(), tags: ["live"])
+    .AddDbContextCheck<AppDbContext>("db", tags: ["ready"]);
 
 builder.Services.AddControllers()
     .AddJsonOptions(opts =>
@@ -217,12 +221,11 @@ if (app.Environment.IsDevelopment())
         db.Database.EnsureCreated();
         var seedLogger = loggerFactory.CreateLogger("CatalogSeed");
         await RunProductSeedAsync(db, app.Environment, app.Configuration, seedLogger);
+        await MigratePickupPreferenceAsync(db);
+        var passwordHasher = scope.ServiceProvider.GetRequiredService<PasswordHasher<AdminUser>>();
+        var adminLogger = loggerFactory.CreateLogger("AdminSeed");
+        await AdminSeed.SeedAsync(db, app.Configuration, passwordHasher, adminLogger);
     }
-
-    await MigratePickupPreferenceAsync(db);
-    var passwordHasher = scope.ServiceProvider.GetRequiredService<PasswordHasher<AdminUser>>();
-    var adminLogger = loggerFactory.CreateLogger("AdminSeed");
-    await AdminSeed.SeedAsync(db, app.Configuration, passwordHasher, adminLogger);
 }
 
 // PostgreSQL / Neon / Render: apply EF migrations before any code touches tables.
@@ -237,8 +240,7 @@ if (app.Environment.IsDevelopment())
     if (!isSqlite)
     {
         var migrationLogger = loggerFactory.CreateLogger("Startup");
-        await db.Database.MigrateAsync();
-        migrationLogger.LogInformation("Database schema is up to date (EF Core migrations applied).");
+        await MigrateDatabaseWithRetryAsync(db, migrationLogger);
 
         var seedLogger = loggerFactory.CreateLogger("CatalogSeed");
         await RunProductSeedAsync(db, app.Environment, app.Configuration, seedLogger);
@@ -275,6 +277,53 @@ static async Task MigratePickupPreferenceAsync(AppDbContext db)
         Console.WriteLine($"Migrated {updated} reservation(s) from BeverlyHills to SantaMonica pickup.");
 }
 
+static async Task MigrateDatabaseWithRetryAsync(
+    AppDbContext db,
+    ILogger logger,
+    CancellationToken cancellationToken = default)
+{
+    const int maxAttempts = 6;
+
+    for (var attempt = 1; attempt <= maxAttempts; attempt++)
+    {
+        try
+        {
+            await db.Database.MigrateAsync(cancellationToken);
+            logger.LogInformation("Database schema is up to date (EF Core migrations applied).");
+            return;
+        }
+        catch (Exception ex) when (attempt < maxAttempts && IsTransientDatabaseException(ex))
+        {
+            var delaySeconds = Math.Min(30, (int)Math.Pow(2, attempt));
+            logger.LogWarning(
+                ex,
+                "Database migration attempt {Attempt}/{MaxAttempts} failed; retrying in {DelaySeconds}s",
+                attempt,
+                maxAttempts,
+                delaySeconds);
+            await Task.Delay(TimeSpan.FromSeconds(delaySeconds), cancellationToken);
+        }
+    }
+}
+
+static bool IsTransientDatabaseException(Exception ex)
+{
+    for (var current = ex; current != null; current = current.InnerException)
+    {
+        if (current is NpgsqlException or System.Net.Sockets.SocketException or TimeoutException)
+            return true;
+
+        var message = current.Message;
+        if (message.Contains("timeout", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("connection", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("no route to host", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("transient", StringComparison.OrdinalIgnoreCase))
+            return true;
+    }
+
+    return false;
+}
+
 app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -287,6 +336,13 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("live"),
+});
+app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("ready"),
+});
 
 app.Run();

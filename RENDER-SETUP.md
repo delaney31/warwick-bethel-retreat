@@ -34,7 +34,8 @@ Then **Manual Deploy** → Deploy latest commit.
 ./scripts/verify-render-api.sh https://warwick-bethel-retreat.onrender.com
 ```
 
-Expect HTTP **200** on `/health` and `/api/vehicles/warwick-bethel-retreat`.
+Expect HTTP **200** on `/health` (process liveness) and `/api/vehicles/warwick-bethel-retreat`.  
+Use `/health/ready` when you need to confirm Neon connectivity (includes DB check).
 
 ## Vercel (after API is 200)
 
