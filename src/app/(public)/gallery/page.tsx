@@ -24,7 +24,7 @@ export default function GalleryPage() {
         <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-sage-600">Gallery</p>
         <h1 className="mt-3 font-serif text-4xl font-light text-stone-900">The retreat, in detail</h1>
         <p className="mt-4 text-stone-600">
-          Vaulted ceilings · large windows · hardwood floors · wooded surroundings.{" "}
+          Every photo is labeled by room — main bedroom, second bedroom, shared spaces, and exterior.{" "}
           <Link href="/rooms" className="font-medium text-sage-700 underline-offset-2 hover:underline">
             View rooms &amp; rates
           </Link>

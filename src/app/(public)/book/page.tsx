@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BookingRequestForm } from "@/components/public/booking-request-form";
+import { CHECK_IN_OUT_NOTE } from "@/lib/content/policies";
 import { pageMetadata } from "@/lib/content/site-metadata";
 import { JsonLd } from "@/components/seo/json-ld";
 import {
@@ -46,10 +47,15 @@ export default function BookPage() {
             A private retreat minutes from Warwick Bethel. Submit your preferred dates — our host
             personally reviews every request before inviting you to pay.
           </p>
+          <p className="mt-3 text-sm leading-relaxed text-stone-600">{CHECK_IN_OUT_NOTE}</p>
           <p className="mt-3 text-sm text-stone-500">
             Prefer to browse first?{" "}
             <Link href="/availability" className="font-medium text-sage-700 underline-offset-2 hover:underline">
               Check the live calendar
+            </Link>{" "}
+            or read our{" "}
+            <Link href="/policies" className="font-medium text-sage-700 underline-offset-2 hover:underline">
+              guest policies
             </Link>
             .
           </p>

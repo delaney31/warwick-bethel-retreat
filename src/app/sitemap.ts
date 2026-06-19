@@ -11,6 +11,7 @@ const PUBLIC_ROUTES = [
   "/book",
   "/faq",
   "/contact",
+  "/policies",
 ] as const;
 
 /** High-intent SEO URLs also emitted via SEO_LANDING_SLUGS — listed for sitemap priority. */

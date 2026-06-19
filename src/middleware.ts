@@ -11,6 +11,7 @@ const PUBLIC_PATHS = [
   "/book",
   "/faq",
   "/contact",
+  "/policies",
   "/guides",
   "/reservations",
   "/api/booking",

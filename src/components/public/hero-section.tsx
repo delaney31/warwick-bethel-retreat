@@ -43,31 +43,38 @@ export function HeroSection() {
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/55">
           {HOMEPAGE_HERO.subintro}{" "}
           <Link
-            href="/stay-near-warwick-bethel"
+            href="/lodging-near-warwick-bethel"
             className="font-medium text-amber-300/90 underline-offset-4 hover:text-amber-200"
           >
-            Stay near Warwick Bethel
+            Lodging near Warwick Bethel
           </Link>{" "}
-          in a private{" "}
+          in the Warwick area — a{" "}
           <Link
-            href="/tuxedo-park-ny-stay"
+            href="/warwick-bethel-visitor-stay"
             className="font-medium text-amber-300/90 underline-offset-4 hover:text-amber-200"
           >
-            Tuxedo Park cottage
+            Bethel visitor stay
           </Link>{" "}
-          — or choose a{" "}
+          (not a general Tuxedo Park resort). Traveling lightly? See our{" "}
           <Link
             href="/private-room-near-warwick-ny"
             className="font-medium text-amber-300/90 underline-offset-4 hover:text-amber-200"
           >
             private room near Warwick, NY
-          </Link>{" "}
-          when traveling lightly.
+          </Link>
+          .
         </p>
 
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
           <Button href="/book" size="lg">
             Request Your Stay
+          </Button>
+          <Button
+            href="/gallery"
+            size="lg"
+            className="border-white/25 bg-white/10 text-white backdrop-blur-sm hover:bg-white/15"
+          >
+            View Gallery
           </Button>
           <Button
             href="/availability"
@@ -82,6 +89,12 @@ export function HeroSection() {
           aria-label="Visitor planning links"
           className="mt-8 flex flex-wrap gap-2"
         >
+          <Link
+            href="/gallery"
+            className="rounded-full border border-amber-400/35 bg-amber-400/10 px-3 py-1.5 text-[11px] font-medium text-amber-100 transition hover:border-amber-300/50 hover:text-white"
+          >
+            Photo gallery
+          </Link>
           {HOMEPAGE_SEO_LINKS.map((link) => (
             <Link
               key={link.href}

@@ -1,4 +1,10 @@
+import { CHECK_IN_OUT_NOTE, CHECK_IN_TIME, CHECK_OUT_TIME } from "@/lib/content/policies";
+
 export const FAQ_ITEMS = [
+  {
+    question: "What are check-in and check-out times?",
+    answer: CHECK_IN_OUT_NOTE,
+  },
   {
     question: "How far is the retreat from Warwick Bethel?",
     answer:
@@ -27,7 +33,7 @@ export const FAQ_ITEMS = [
   {
     question: "Can I request early check-in or late check-out?",
     answer:
-      "Add any timing preferences in your reservation notes. We'll confirm availability based on the calendar and prior guests.",
+      `Standard check-in is after ${CHECK_IN_TIME} and check-out is before ${CHECK_OUT_TIME}. Add any timing preferences in your reservation notes — we'll confirm based on the calendar and prior guests.`,
   },
   {
     question: "Is the property suitable for families?",
@@ -37,6 +43,6 @@ export const FAQ_ITEMS = [
   {
     question: "What is your cancellation policy?",
     answer:
-      "Cancellation terms are shared upon approval. Contact us before your stay if plans change — we aim to be fair and transparent.",
+      "Before approval there is no charge. After payment, contact us as soon as plans change — we handle each stay personally and aim to be fair. See the Policies page on this site for full details.",
   },
 ];

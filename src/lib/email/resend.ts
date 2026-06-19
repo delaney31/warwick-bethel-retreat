@@ -54,7 +54,7 @@ export async function sendEmail(input: SendEmailInput): Promise<boolean> {
 
   if (!from) {
     console.warn(
-      "[email] EMAIL_FROM not set — use e.g. Tuxedo Retreat <stays@pacificluxrentals.com>. Skipping send.",
+      "[email] EMAIL_FROM not set — use e.g. Tuxedo Retreat <bookings@tuxedoretreat.com>. Skipping send.",
     );
     return false;
   }
@@ -96,5 +96,5 @@ export function resolveHostAlertEmail(): string {
   if (host) return host;
   const admin = process.env.ADMIN_EMAIL?.trim();
   if (admin) return admin;
-  return "pacificluxerentals@gmail.com";
+  return "bookings@tuxedoretreat.com";
 }

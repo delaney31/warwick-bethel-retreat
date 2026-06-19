@@ -6,12 +6,12 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
     slug: "lodging-near-warwick-bethel",
     metaTitle: "Lodging Near Warwick Bethel",
     metaDescription:
-      "Peaceful lodging near Warwick Bethel — two-bedroom cottage in Tuxedo Park with host-reviewed bookings, wooded quiet, and a 15-minute drive to headquarters.",
+      "Peaceful Bethel visitor lodging near Warwick Bethel — two-bedroom cottage in the Warwick, NY area with host-reviewed bookings and a 15-minute drive to headquarters.",
     h1: "Lodging Near Warwick Bethel",
-    eyebrow: "Tuxedo Retreat · Warwick, New York",
+    eyebrow: "Bethel visitor lodging · Warwick area",
     intro: [
       "If you are planning time at Warwick Bethel, thoughtful lodging nearby can make the week gentler — a place to rest, reflect, and sleep well after full days.",
-      "Tuxedo Retreat is a small, host-managed cottage in the Tuxedo Park area: two bedrooms, a wooded deck, and an atmosphere chosen for calm rather than crowds.",
+      "Tuxedo Retreat is a small, host-managed cottage in the Warwick area (Tuxedo Park neighborhood) — not a general Hudson Valley resort. Two bedrooms, a wooded deck, and calm rather than crowds.",
       "We welcome Bethel visitors who appreciate a personal reservation process — request your dates, receive a host review, and pay only after approval.",
     ],
     bethelDistance: {
@@ -86,9 +86,9 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
     slug: "stay-near-warwick-bethel",
     metaTitle: "Stay Near Warwick Bethel",
     metaDescription:
-      "Tuxedo Retreat offers a peaceful nightly stay near Warwick Bethel with private rooms, wooded surroundings, host-reviewed bookings, and secure payment after approval.",
+      "Bethel visitor stay near Warwick Bethel — peaceful nightly lodging at Tuxedo Retreat in the Warwick, NY area with host-reviewed bookings and secure payment after approval.",
     h1: "A Peaceful Stay Near Warwick Bethel",
-    eyebrow: "Nightly stay · Tuxedo Park",
+    eyebrow: "Bethel visitor stay · Warwick area",
     intro: [
       "A Bethel week is full — spiritually rich, socially full, and physically demanding. A good stay nearby gives you room to breathe.",
       "Tuxedo Retreat offers nightly accommodations in a wooded cottage setting: premium bedding, soft light, and space designed for unhurried evenings.",
@@ -231,12 +231,12 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
     slug: "private-room-near-warwick-ny",
     metaTitle: "Private Room Near Warwick, NY",
     metaDescription:
-      "Private main-bedroom stay near Warwick, NY — peaceful Bethel-adjacent lodging at Tuxedo Retreat from $150/night. Host-reviewed, two-guest base rate.",
+      "Private main-bedroom Bethel visitor stay near Warwick, NY — peaceful lodging at Tuxedo Retreat from $150/night in the Warwick area. Host-reviewed, two-guest base rate.",
     h1: "Private Room Stay Near Warwick, New York",
-    eyebrow: "Main bedroom · Private suite",
+    eyebrow: "Bethel visitor stay · Main bedroom",
     intro: [
-      "Not every traveler needs an entire house. Our main bedroom package offers a private suite with access to shared living areas — ideal when you want simplicity and quiet near Warwick.",
-      "Tuxedo Retreat sits in the Tuxedo Park area, a short drive from Warwick Bethel and the surrounding Hudson Valley countryside.",
+      "Not every Bethel visitor needs an entire house. Our main bedroom package offers a private suite with access to shared living areas — ideal when you want simplicity and quiet near Warwick Bethel.",
+      "Tuxedo Retreat sits in the Warwick area (Tuxedo Park neighborhood), a short drive from Warwick Bethel headquarters — not a commercial hotel strip.",
       "You still receive personal host communication, clear pricing, and the same unhurried approval process as full-cottage guests.",
     ],
     bethelDistance: {
@@ -302,15 +302,15 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
 
   "tuxedo-ny-retreat": {
     slug: "tuxedo-ny-retreat",
-    metaTitle: "Tuxedo, NY Retreat — Stay Near Warwick Bethel",
+    metaTitle: "Bethel Visitor Stay — Warwick Area Cottage",
     metaDescription:
-      "A quiet Tuxedo, NY retreat with two bedrooms, wooded deck, and host-managed stays — 15 minutes from Warwick Bethel. Request dates at Tuxedo Retreat.",
-    h1: "A Quiet Retreat in Tuxedo, New York",
-    eyebrow: "Tuxedo · Hudson Valley",
+      "Bethel visitor cottage in the Warwick, NY area — quiet two-bedroom stay at Tuxedo Retreat, 15 minutes from Warwick Bethel headquarters. Request dates directly.",
+    h1: "Bethel Visitor Stay in the Warwick Area",
+    eyebrow: "Warwick Bethel visitors · Not a resort",
     intro: [
-      "Tuxedo and the surrounding Warwick area offer something rare so close to New York City: trees, stillness, and room to breathe.",
-      "Tuxedo Retreat is a small luxury cottage here — chosen by Bethel visitors and weekend travelers who want comfort without a commercial hotel feel.",
-      "Two bedrooms, vaulted light, hardwood floors, and a deck overlooking woodland — with a host who knows the property and the rhythm of local visits.",
+      "For Warwick Bethel visitors, Tuxedo Retreat is a quiet cottage stay about fifteen minutes from headquarters — in the wooded Warwick area (Tuxedo Park neighborhood), not a general Hudson Valley vacation rental.",
+      "Tuxedo and the surrounding Warwick area offer trees, stillness, and room to breathe between convention sessions.",
+      "Two bedrooms, vaulted light, hardwood floors, and a deck overlooking woodland — with a host who knows the property and the rhythm of Bethel visits.",
     ],
     bethelDistance: {
       headline: "Tuxedo to Warwick Bethel",
@@ -373,12 +373,13 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
 
   "tuxedo-park-ny-stay": {
     slug: "tuxedo-park-ny-stay",
-    metaTitle: "Tuxedo Park, NY Stay Near Warwick Bethel",
+    metaTitle: "Bethel Visitor Stay — Tuxedo Park Area (Warwick, NY)",
     metaDescription:
-      "Overnight stay in the Tuxedo Park, NY area — peaceful cottage lodging at Tuxedo Retreat, minutes from Warwick Bethel. Two bedrooms, host-reviewed booking.",
-    h1: "Overnight Stay in the Tuxedo Park Area",
-    eyebrow: "Tuxedo Park · Private cottage",
+      "Bethel visitor lodging in the Tuxedo Park area of Warwick, NY — peaceful cottage at Tuxedo Retreat, minutes from Warwick Bethel. Not a general Tuxedo Park resort.",
+    h1: "Bethel Visitor Stay in the Tuxedo Park Area",
+    eyebrow: "Warwick Bethel lodging · Warwick area",
     intro: [
+      "For Warwick Bethel visitors, this page describes our cottage location — the wooded Tuxedo Park neighborhood within the Warwick, NY area. We are not a general Tuxedo Park resort or unrelated Hudson Valley rental.",
       "Tuxedo Park is known for woodland privacy and a slower pace — a fitting setting when your days at Warwick Bethel are full.",
       "Our cottage offers an overnight stay in this atmosphere: not a resort, not a dormitory — a home-like space with a gracious host.",
       "Reserve the main bedroom for an intimate trip, or both bedrooms when family or friends travel with you.",
@@ -431,8 +432,8 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
       },
     ],
     cta: {
-      heading: "Plan your Tuxedo Park stay",
-      body: "Check availability and send a request when your travel dates are firm.",
+      heading: "Request your Bethel visitor stay",
+      body: "Check availability and send a request when your Warwick Bethel dates are firm.",
     },
     relatedLinks: [
       { href: "/tuxedo-ny-retreat", label: "Tuxedo, NY retreat" },
@@ -446,12 +447,12 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
     slug: "warwick-ny-nightly-stay",
     metaTitle: "Warwick, NY Nightly Stay Near Bethel",
     metaDescription:
-      "Nightly stay in Warwick, NY area at Tuxedo Retreat — peaceful cottage near Warwick Bethel from $150/night. Two bedrooms, wooded deck, host approval.",
-    h1: "Nightly Stay in the Warwick, New York Area",
-    eyebrow: "Warwick · Orange County",
+      "Nightly Bethel visitor stay in the Warwick, NY area at Tuxedo Retreat — peaceful cottage near Warwick Bethel from $150/night. Two bedrooms, wooded deck, host approval.",
+    h1: "Nightly Bethel Visitor Stay in the Warwick Area",
+    eyebrow: "Warwick Bethel visitors · Orange County",
     intro: [
       "Warwick draws visitors for Bethel, countryside, and a gentler pace than the city. A nightly stay nearby should feel restful — not like another appointment.",
-      "Tuxedo Retreat provides short-term lodging in the Warwick / Tuxedo Park area: clear rates, a visible calendar, and communication with a real host.",
+      "Tuxedo Retreat provides Bethel visitor lodging in the Warwick area (Tuxedo Park neighborhood): clear rates, a visible calendar, and communication with a real host.",
       "Whether you are here for a convention week or a brief visit, you can request dates without pressure and pay only after approval.",
     ],
     bethelDistance: {

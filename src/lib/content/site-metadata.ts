@@ -9,6 +9,7 @@ import {
 import { PROPERTY_IMAGES } from "@/lib/content/property";
 
 const siteUrl = getCanonicalSiteUrl();
+const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION?.trim();
 
 export const DEFAULT_OG_IMAGE_PATH = PROPERTY_IMAGES.hero;
 
@@ -66,6 +67,13 @@ export const rootMetadata: Metadata = {
     index: true,
     follow: true,
   },
+  ...(googleSiteVerification
+    ? {
+        verification: {
+          google: googleSiteVerification,
+        },
+      }
+    : {}),
 };
 
 export function pageMetadata({

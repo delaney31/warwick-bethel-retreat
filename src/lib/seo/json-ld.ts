@@ -1,4 +1,6 @@
-import { getCanonicalSiteUrl, SITE_CONTACT_EMAIL, SITE_NAME } from "@/lib/content/brand";
+import { getCanonicalSiteUrl, SITE_CONTACT_EMAIL, SITE_NAME, SITE_PHONE_TEL } from "@/lib/content/brand";
+import { getSameAsProfileUrls } from "@/lib/content/off-site-listings";
+import { RETREAT_LOCATION } from "@/lib/content/seo-landings/constants";
 import { PROPERTY_IMAGES } from "@/lib/content/property";
 
 type JsonLd = Record<string, unknown>;
@@ -20,21 +22,28 @@ export function buildJsonLdGraph(...nodes: JsonLd[]): JsonLd {
 }
 
 export function lodgingBusinessSchema(): JsonLd {
+  const sameAs = getSameAsProfileUrls();
   return {
     "@type": "LodgingBusiness",
     "@id": `${siteUrl()}/#lodging`,
     name: SITE_NAME,
     url: siteUrl(),
     description:
-      "Luxury nightly stay near Warwick Bethel with two bedrooms, wooded views, and host-reviewed bookings.",
+      "Bethel visitor lodging near Warwick Bethel — two-bedroom cottage in the Warwick, NY area with wooded views and host-reviewed bookings.",
     image: absoluteUrl(PROPERTY_IMAGES.hero),
-    telephone: "+18134937008",
+    telephone: SITE_PHONE_TEL,
     email: SITE_CONTACT_EMAIL,
+    ...(sameAs.length > 0 ? { sameAs } : {}),
+    areaServed: {
+      "@type": "Place",
+      name: "Warwick Bethel visitors",
+    },
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Tuxedo Park",
+      addressLocality: "Warwick",
       addressRegion: "NY",
       addressCountry: "US",
+      description: RETREAT_LOCATION.area,
     },
     amenityFeature: [
       { "@type": "LocationFeatureSpecification", name: "Two bedrooms", value: true },

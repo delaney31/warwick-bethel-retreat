@@ -99,6 +99,10 @@ Run: `chmod +x scripts/verify-production-domain.sh && ./scripts/verify-productio
 |----------|----------------|
 | `NEXT_PUBLIC_APP_URL` | `https://tuxedoretreat.com` |
 | `NEXT_PUBLIC_APP_NAME` | `Tuxedo Retreat` |
+| `GOOGLE_SITE_VERIFICATION` | *(optional)* Search Console HTML tag `content` value |
+| `NEXT_PUBLIC_GOOGLE_BUSINESS_URL` | *(optional)* Public Google Maps / GBP URL |
+| `NEXT_PUBLIC_AIRBNB_LISTING_URL` | *(optional)* Airbnb listing URL |
+| `NEXT_PUBLIC_VRBO_LISTING_URL` | *(optional)* Vrbo listing URL |
 | `DATABASE_URL` | Neon pooled URL |
 | `ADMIN_PASSWORD` | Host password (8+ chars) |
 | `STRIPE_SECRET_KEY` | `sk_live_...` or `sk_test_...` |
@@ -132,7 +136,7 @@ After DNS + Vercel primary domain + redeploy:
 
 | Route | Expect |
 |-------|--------|
-| `/` | Homepage, title **Tuxedo Retreat**, URL stays on `tuxedoretreat.com` |
+| `/` | Homepage, title **Bethel Visitor Lodging Near Warwick Bethel \| Tuxedo Retreat**, URL stays on `tuxedoretreat.com` |
 | `/book` | Booking form, `/api/booking/*` on same host |
 | `/availability` | Calendar loads |
 | `/rooms` | Rooms page |
@@ -143,6 +147,8 @@ After DNS + Vercel primary domain + redeploy:
 | `/admin/login` | Host login |
 | `/sitemap.xml` | All `<loc>` URLs use `https://tuxedoretreat.com` |
 | `/robots.txt` | `Sitemap: https://tuxedoretreat.com/sitemap.xml` |
+
+**Search Console & off-site discovery:** see `SEO-GROWTH.md` for sitemap submission, Google Business Profile, and marketplace listing setup.
 
 ### Booking sanity
 

@@ -81,9 +81,9 @@ export function ExperienceSection() {
           </div>
           <div className="relative aspect-[5/4] overflow-hidden rounded-2xl">
             <PropertyImage
-              src={PROPERTY_IMAGES.windows}
-              alt="Master bedroom with natural light"
-              imageKey="windows"
+              src={PROPERTY_IMAGES.mainBedroomWide}
+              alt="Main bedroom with queen bed and deck access"
+              imageKey="mainBedroomWide"
               fill
               sizes="(max-width: 640px) 100vw, 40vw"
             />

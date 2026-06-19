@@ -1,14 +1,20 @@
 import { formatStayPackageRateLine, StayPackage } from "@/lib/pricing/stay-packages";
 
+import { CHECK_IN_TIME, CHECK_OUT_TIME } from "@/lib/content/policies";
+
 /** Shared facts used across SEO landing pages — keep aligned with property copy. */
 export const RETREAT_LOCATION = {
-  area: "Tuxedo Park · Warwick, New York",
+  area: "Warwick, New York area (Tuxedo Park neighborhood)",
   distanceToBethel: "approximately 15 minutes by car",
   driveNote:
-    "Most visitors reach Warwick Bethel from the cottage in about fifteen minutes, depending on traffic and time of day.",
+    "Most Bethel visitors reach Warwick Bethel headquarters from the cottage in about fifteen minutes, depending on traffic and time of day.",
+  brandNote:
+    "Tuxedo Retreat serves Warwick Bethel visitors — a private cottage in the Warwick area, not a general Tuxedo Park resort or unrelated Hudson Valley rental.",
 } as const;
 
 export const RETREAT_PROPERTY = {
+  checkIn: CHECK_IN_TIME,
+  checkOut: CHECK_OUT_TIME,
   bedrooms: 2,
   bathrooms: "1.5",
   sleepsIncluded: 2,
@@ -66,7 +72,9 @@ export const ROOM_OPTIONS = [
 ] as const;
 
 export const CORE_SITE_LINKS = [
+  { href: "/gallery", label: "Photo gallery" },
   { href: "/rooms", label: "Rooms & amenities" },
+  { href: "/policies", label: "Guest policies" },
   { href: "/availability", label: "Availability" },
   { href: "/faq", label: "FAQ" },
   { href: "/book", label: "Request your stay" },

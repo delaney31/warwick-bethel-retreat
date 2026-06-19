@@ -15,6 +15,7 @@ import {
   serializeReservation,
   type PublicCalendarPayload,
 } from "@/lib/reservations";
+import { notifyGuestBookingRequestReceived } from "@/lib/email/notify-guest-booking";
 import { notifyHostNewBookingRequest } from "@/lib/sms/notify-booking-request";
 
 export const BOOKING_BASE_RATE = 150;
@@ -233,6 +234,17 @@ export async function createRetreatReservation(
       guestName: row.guestName,
       guestEmail: payload.guestEmail,
       phone: payload.guestPhone,
+      checkIn: row.checkIn,
+      checkOut: row.checkOut,
+      nights: row.nights,
+      guestCount: row.guestCount,
+      roomPackage: row.roomPackage,
+      reservationId: row.id,
+    });
+
+    void notifyGuestBookingRequestReceived({
+      guestName: row.guestName,
+      guestEmail: payload.guestEmail,
       checkIn: row.checkIn,
       checkOut: row.checkOut,
       nights: row.nights,

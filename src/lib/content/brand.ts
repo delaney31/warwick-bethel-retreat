@@ -8,19 +8,35 @@ export const SITE_NAME = "Tuxedo Retreat";
 /** Primary guest contact — contact form, JSON-LD, and booking inquiries. */
 export const SITE_CONTACT_EMAIL = "bookings@tuxedoretreat.com";
 
-export const SITE_TAGLINE = "Luxury nightly stay near Warwick Bethel";
+export const SITE_PHONE_DISPLAY = "(813) 493-7008";
+export const SITE_PHONE_TEL = "+18134937008";
 
-export const SITE_TITLE = "Lodging Near Warwick Bethel | Tuxedo Retreat";
+/** Visible host profile for trust on contact and booking pages. */
+export const HOST_PROFILE = {
+  name: "Timothy — your host",
+  bio:
+    "Tuxedo Retreat is personally hosted for Warwick Bethel visitors. I review every reservation request, answer questions before you book, and share clear check-in guidance after your stay is approved.",
+  phoneDisplay: SITE_PHONE_DISPLAY,
+  phoneTel: SITE_PHONE_TEL,
+} as const;
+
+export const SITE_TAGLINE = "Bethel visitor lodging · Warwick, NY area";
+
+/** Clarifies location vs. unrelated Tuxedo Park resort listings. */
+export const LOCATION_CLARITY =
+  "Quiet cottage in the Warwick, NY area (Tuxedo Park neighborhood) — about 15 minutes from Warwick Bethel headquarters. Not a general Hudson Valley resort.";
+
+export const SITE_TITLE = "Bethel Visitor Lodging Near Warwick Bethel | Tuxedo Retreat";
 
 export const SITE_DESCRIPTION =
-  "Lodging near Warwick Bethel at Tuxedo Retreat — peaceful Bethel visitor accommodation in Tuxedo, NY. Host-reviewed stays from $150/night, secure payment after approval.";
+  "Bethel visitor lodging near Warwick Bethel at Tuxedo Retreat — peaceful cottage stays in the Warwick, NY area from $150/night. Host-reviewed booking, 15 minutes from headquarters.";
 
-export const HERO_EYEBROW = "Tuxedo Retreat · Luxury nightly stay near Warwick Bethel";
+export const HERO_EYEBROW = "Bethel visitor stay · Tuxedo Retreat · Warwick area";
 
-export const HERO_HEADLINE = "A peaceful luxury stay minutes from Warwick Bethel";
+export const HERO_HEADLINE = "Bethel visitor lodging near Warwick Bethel";
 
 export const HERO_SUBHEADLINE =
-  "Tuxedo Retreat offers two serene bedrooms, wooded views, and warm private hosting for Bethel visitors who want comfort after full days at Warwick.";
+  "Tuxedo Retreat is a host-managed cottage for Warwick Bethel visitors — two serene bedrooms, wooded quiet, and a short drive to headquarters after full convention days.";
 
 /** Vercel deployment hostnames that must 308 to the canonical site. */
 export const LEGACY_REDIRECT_HOSTS = [

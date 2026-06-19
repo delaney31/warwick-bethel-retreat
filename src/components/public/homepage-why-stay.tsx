@@ -15,7 +15,7 @@ export function HomepageWhyStay() {
           </h2>
           <p className="mt-4 text-base leading-relaxed text-stone-600">
             Tuxedo Retreat is Bethel visitor lodging in the truest sense — peaceful,
-            respectful, and personally hosted in Tuxedo, New York.
+            respectful, and personally hosted in the Warwick, NY area, fifteen minutes from headquarters.
           </p>
         </div>
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ExperienceSection } from "@/components/public/experience-section";
 import { HeroSection } from "@/components/public/hero-section";
 import { TrustStrip } from "@/components/public/trust-strip";
 import { HomepageExploreLinks } from "@/components/public/homepage-explore-links";
@@ -42,11 +43,12 @@ export default function HomePage() {
       />
       <HeroSection />
       <TrustStrip />
+      <GalleryPreviewSection />
+      <ExperienceSection />
       <HomepageExploreLinks />
       <HomepageWhyStay />
       <BookingFlowSection />
       <HomepageFaqPreview />
-      <GalleryPreviewSection />
       <FinalCtaSection />
     </>
   );
