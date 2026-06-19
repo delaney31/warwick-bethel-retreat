@@ -2,10 +2,16 @@
 export const CHECK_IN_TIME = "3:00 PM";
 export const CHECK_OUT_TIME = "11:00 AM";
 
+export type PolicySection = {
+  title: string;
+  summary?: string;
+  bullets: string[];
+};
+
 export const CHECK_IN_OUT_NOTE =
   `Standard check-in is after ${CHECK_IN_TIME} and check-out is before ${CHECK_OUT_TIME}. Early arrival or late departure may be possible when the calendar allows — mention it in your reservation notes.`;
 
-export const CANCELLATION_POLICY = {
+export const CANCELLATION_POLICY: PolicySection = {
   title: "Cancellation",
   summary:
     "If your Bethel plans change, contact us as soon as you can. We handle each stay personally and aim to be fair.",
@@ -16,7 +22,7 @@ export const CANCELLATION_POLICY = {
   ],
 };
 
-export const HOUSE_RULES = {
+export const HOUSE_RULES: PolicySection = {
   title: "House rules",
   bullets: [
     "Quiet hours after 10:00 PM — residential neighborhood.",
@@ -28,7 +34,7 @@ export const HOUSE_RULES = {
   ],
 };
 
-export const PRIVACY_POLICY = {
+export const PRIVACY_POLICY: PolicySection = {
   title: "Privacy",
   summary:
     "We collect only what we need to review and host your stay — name, email, phone, dates, and any notes you provide.",
@@ -39,3 +45,9 @@ export const PRIVACY_POLICY = {
     "Contact us at bookings@tuxedoretreat.com to ask about your reservation data.",
   ],
 };
+
+export const POLICY_SECTIONS: PolicySection[] = [
+  CANCELLATION_POLICY,
+  HOUSE_RULES,
+  PRIVACY_POLICY,
+];

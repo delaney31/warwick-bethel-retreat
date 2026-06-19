@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  CANCELLATION_POLICY,
   CHECK_IN_OUT_NOTE,
-  HOUSE_RULES,
-  PRIVACY_POLICY,
+  POLICY_SECTIONS,
 } from "@/lib/content/policies";
 import { pageMetadata } from "@/lib/content/site-metadata";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -46,13 +44,13 @@ export default function PoliciesPage() {
           </p>
         </section>
 
-        {[CANCELLATION_POLICY, HOUSE_RULES, PRIVACY_POLICY].map((section) => (
+        {POLICY_SECTIONS.map((section) => (
           <section
             key={section.title}
             className="mt-8 rounded-2xl border border-stone-200 bg-white p-8"
           >
             <h2 className="text-lg font-medium text-stone-900">{section.title}</h2>
-            {"summary" in section && section.summary ? (
+            {section.summary ? (
               <p className="mt-3 text-sm leading-relaxed text-stone-600">{section.summary}</p>
             ) : null}
             <ul className="mt-4 space-y-2 text-sm text-stone-600">
