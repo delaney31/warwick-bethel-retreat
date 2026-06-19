@@ -6,6 +6,8 @@
 
 See **[DOMAIN-SETUP.md](./DOMAIN-SETUP.md)** for DNS, primary domain, and redirect fixes.
 
+See **[PRODUCTION-STACK.md](./PRODUCTION-STACK.md)** for architecture, Neon vs Render, and what to remove from Vercel.
+
 ## Production environment variables
 
 | Variable | Value |
@@ -16,6 +18,22 @@ See **[DOMAIN-SETUP.md](./DOMAIN-SETUP.md)** for DNS, primary domain, and redire
 | `ADMIN_PASSWORD` | Your host password |
 | `STRIPE_SECRET_KEY` | Stripe secret key |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` for `https://tuxedoretreat.com/api/stripe/webhook` |
+
+### Do not set (legacy Render — remove if present)
+
+| Variable | Action |
+|----------|--------|
+| `NEXT_PUBLIC_API_BASE_URL` | **Delete** from Vercel production |
+| `INTERNAL_API_URL` | **Delete** |
+| `NEXT_PUBLIC_API_URL` | **Delete** |
+
+Automated cleanup (valid `VERCEL_TOKEN` in `.env.deploy`):
+
+```bash
+./scripts/cleanup-vercel-render-env.sh
+```
+
+Then redeploy production on Vercel.
 
 ## Git
 

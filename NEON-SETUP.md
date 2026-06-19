@@ -1,6 +1,6 @@
-# Neon database setup — Warwick Bethel Retreat
+# Neon database setup — Warwick Bethel Retreat / Tuxedo Retreat
 
-Neon holds the **Postgres database only**. The API still runs on **Render**; Vercel is the website.
+Neon holds the **Postgres database** for **Vercel (Prisma)**. The legacy Render .NET API is optional — see **[PRODUCTION-STACK.md](./PRODUCTION-STACK.md)**.
 
 ## 1. Create the Neon project (dashboard)
 
