@@ -12,7 +12,17 @@ export const FAQ_ITEMS = [
   {
     question: "What is included in the nightly rate?",
     answer:
-      "Main bedroom stays start at $150/night for 2 guests. Two-bedroom stays start at $200/night for 2 guests. Each additional guest is $25 per person per night. All payments are collected upfront at checkout after approval.",
+      "Main bedroom stays start at $150/night for 2 guests. Two-bedroom stays start at $200/night for 2 guests. Each additional guest is $25 per person per night. Your rate includes premium bedding and linens, high-speed Wi‑Fi, and use of the kitchenette (microwave, mini fridge, and coffee station). All payments are collected upfront at checkout after approval.",
+  },
+  {
+    question: "Is laundry available?",
+    answer:
+      "Yes. A washer and dryer are available on request. Add a note when you request your stay, or contact us before arrival, and your host will confirm availability for your dates.",
+  },
+  {
+    question: "Is there Wi‑Fi?",
+    answer:
+      "Yes. High-speed Wi‑Fi is included throughout the cottage — suitable for video calls, streaming, and staying connected during your Bethel visit.",
   },
   {
     question: "Can I request early check-in or late check-out?",

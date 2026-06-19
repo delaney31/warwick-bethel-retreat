@@ -1,4 +1,4 @@
-import { getCanonicalSiteUrl, SITE_NAME } from "@/lib/content/brand";
+import { getCanonicalSiteUrl, SITE_CONTACT_EMAIL, SITE_NAME } from "@/lib/content/brand";
 import { PROPERTY_IMAGES } from "@/lib/content/property";
 
 type JsonLd = Record<string, unknown>;
@@ -29,7 +29,7 @@ export function lodgingBusinessSchema(): JsonLd {
       "Luxury nightly stay near Warwick Bethel with two bedrooms, wooded views, and host-reviewed bookings.",
     image: absoluteUrl(PROPERTY_IMAGES.hero),
     telephone: "+18134937008",
-    email: "tuxedoretreat@gmail.com",
+    email: SITE_CONTACT_EMAIL,
     address: {
       "@type": "PostalAddress",
       addressLocality: "Tuxedo Park",
@@ -39,12 +39,20 @@ export function lodgingBusinessSchema(): JsonLd {
     amenityFeature: [
       { "@type": "LocationFeatureSpecification", name: "Two bedrooms", value: true },
       { "@type": "LocationFeatureSpecification", name: "Wooded deck", value: true },
+      { "@type": "LocationFeatureSpecification", name: "High-speed Wi-Fi", value: true },
+      {
+        "@type": "LocationFeatureSpecification",
+        name: "Washer and dryer",
+        value: true,
+        description: "Available on request",
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        name: "Kitchenette",
+        value: true,
+        description: "Microwave, mini fridge, and coffee station",
+      },
     ],
-    starRating: {
-      "@type": "Rating",
-      ratingValue: "5",
-      bestRating: "5",
-    },
   };
 }
 

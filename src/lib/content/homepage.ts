@@ -32,7 +32,7 @@ export const HOMEPAGE_SEO_LINKS = [
 /** Match FAQ_ITEMS by question prefix for homepage preview */
 export const HOMEPAGE_FAQ_PREVIEW_QUESTIONS = [
   "How far is the retreat from Warwick Bethel?",
-  "How does the reservation process work?",
+  "Is laundry available?",
   "What is included in the nightly rate?",
 ] as const;
 

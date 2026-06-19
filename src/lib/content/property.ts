@@ -41,16 +41,26 @@ export const GALLERY_IMAGES = [
   { src: "/images/property/outdoor-deck.png", alt: "Private wooded deck with Adirondack seating overlooking the garden", key: "deck" as const },
 ] as const;
 
+/** Shared copy for kitchenette cards and amenity lists. */
+export const KITCHENETTE_NOTE =
+  "Light meal prep only — microwave, mini fridge, and coffee station (not a full kitchen).";
+
+/** Washer/dryer are on-site; guests request access before or at booking. */
+export const LAUNDRY_NOTE =
+  "Washer & dryer available on request — mention it in your reservation notes or contact us before arrival.";
+
 export const AMENITIES = [
   "2 Bedrooms · 1.5 Bathrooms",
   "Sleeps 2 included (+$25/night per extra guest)",
   "Vaulted ceilings & premium natural light",
   "Hardwood floors throughout",
-  "Microwave & mini fridge",
-  "Coffee station",
-  "Beautiful wooded outdoor deck",
+  "Kitchenette: microwave, mini fridge & coffee station",
+  "Washer & dryer available on request",
+  "High-speed Wi‑Fi",
+  "Premium bedding & linens",
+  "Private wooded deck with Adirondack seating",
   "Quiet luxury retreat atmosphere",
-  "15 minutes from Warwick Bethel",
+  "~15 minutes from Warwick Bethel",
 ];
 
 export const PROPERTY_SPECS = {

@@ -320,7 +320,7 @@ function BookingRequestFormInner() {
             rows={4}
             value={form.guestNotes}
             onChange={(e) => update("guestNotes", e.target.value)}
-            hint="Arrival time, special requests, or questions — optional."
+            hint="Arrival time, laundry needs (washer/dryer available on request), or other questions — optional."
           />
         </div>
 

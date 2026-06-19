@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { FormField } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
-import { SITE_NAME } from "@/lib/content/brand";
+import { SITE_CONTACT_EMAIL, SITE_NAME } from "@/lib/content/brand";
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "success">("idle");
@@ -15,7 +15,7 @@ export function ContactForm() {
     const body = encodeURIComponent(
       `Name: ${form.get("name")}\nEmail: ${form.get("email")}\nPhone: ${form.get("phone")}\n\n${form.get("message")}`,
     );
-    window.location.href = `mailto:bookings@tuxedoretreat.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${SITE_CONTACT_EMAIL}?subject=${subject}&body=${body}`;
     setStatus("success");
   }
 

@@ -21,7 +21,7 @@ export function HomepageFaqPreview() {
             Questions Bethel visitors ask
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-stone-600">
-            Distance, rates, and how host-reviewed booking works — answered plainly.
+            Distance, rates, laundry, and how host-reviewed booking works — answered plainly.
           </p>
         </div>
 

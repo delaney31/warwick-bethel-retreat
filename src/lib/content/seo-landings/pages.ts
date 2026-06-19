@@ -40,6 +40,9 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
         { title: "Parking", body: RETREAT_PROPERTY.parking },
         { title: "Entry", body: RETREAT_PROPERTY.entrance },
         { title: "Outdoor space", body: RETREAT_PROPERTY.deck },
+        { title: "Wi‑Fi", body: RETREAT_PROPERTY.wifi },
+        { title: "Laundry", body: RETREAT_PROPERTY.laundry },
+        { title: "Kitchenette", body: RETREAT_PROPERTY.kitchenette },
       ],
     },
     faqs: [
@@ -60,6 +63,11 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
         question: "Can families stay here?",
         answer:
           "Yes. With two bedrooms and space for up to six guests, the cottage suits couples, families, and small groups who want shared space and quiet surroundings.",
+      },
+      {
+        id: "lodging-laundry",
+        question: "Is a washer and dryer available?",
+        answer: RETREAT_PROPERTY.laundry,
       },
     ],
     cta: {
@@ -326,7 +334,7 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
       headline: "The cottage",
       items: [
         { title: "Setting", body: "Wooded, residential quiet — designed for reflection and rest." },
-        { title: "Indoors", body: "Vaulted ceilings, premium bedding, kitchenette, and a curated coffee station." },
+        { title: "Indoors", body: `Vaulted ceilings, premium bedding, ${RETREAT_PROPERTY.kitchenette.toLowerCase()}` },
         { title: "Outdoors", body: RETREAT_PROPERTY.deck },
         { title: "Arrival", body: `${RETREAT_PROPERTY.parking} ${RETREAT_PROPERTY.entrance}` },
       ],
@@ -469,7 +477,8 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
       items: [
         { title: "Sleeps 2–6", body: `${RETREAT_PROPERTY.sleepsIncluded} guests included in base rate; up to ${RETREAT_PROPERTY.maxGuests} with both bedrooms.` },
         { title: "1.5 baths", body: RETREAT_PROPERTY.bathroomsDetail },
-        { title: "Coffee & kitchenette", body: "Keurig station, mini fridge, and microwave for simple mornings." },
+        { title: "Coffee & kitchenette", body: RETREAT_PROPERTY.kitchenette },
+        { title: "Laundry", body: RETREAT_PROPERTY.laundry },
         { title: "Parking", body: RETREAT_PROPERTY.parking },
       ],
     },

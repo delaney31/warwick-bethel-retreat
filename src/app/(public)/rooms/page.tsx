@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PropertyImage } from "@/components/ui/property-image";
-import { AMENITIES, PROPERTY_IMAGES } from "@/lib/content/property";
+import { AMENITIES, KITCHENETTE_NOTE, LAUNDRY_NOTE, PROPERTY_IMAGES } from "@/lib/content/property";
 import { pageMetadata } from "@/lib/content/site-metadata";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -9,7 +9,7 @@ import { breadcrumbSchema, roomOffersSchema } from "@/lib/seo/json-ld";
 export const metadata: Metadata = pageMetadata({
   title: "Rooms & Amenities",
   description:
-    "Two bedrooms, 1.5 baths, wooded deck, coffee station — luxury cottage at Tuxedo Retreat near Warwick Bethel.",
+    "Two bedrooms, 1.5 baths, wooded deck, kitchenette, Wi‑Fi, washer/dryer on request — luxury cottage at Tuxedo Retreat near Warwick Bethel.",
   path: "/rooms",
 });
 
@@ -39,7 +39,7 @@ export default function RoomsPage() {
             { src: PROPERTY_IMAGES.bedroom, key: "bedroom" as const, title: "Bedrooms", desc: "Premium bedding, soft lighting, and flexible sleeping for families or groups." },
             { src: PROPERTY_IMAGES.deck, key: "deck" as const, title: "Wooded Deck", desc: "Private deck with Adirondack seating — morning coffee, evening calm." },
             { src: PROPERTY_IMAGES.daybed, key: "daybed" as const, title: "Cozy Daybed", desc: "Reading nook with natural light — perfect for quiet reflection." },
-            { src: PROPERTY_IMAGES.kitchen, key: "kitchen" as const, title: "Kitchenette", desc: "Mini fridge, microwave, Keurig, and a curated coffee station." },
+            { src: PROPERTY_IMAGES.kitchen, key: "kitchen" as const, title: "Kitchenette", desc: KITCHENETTE_NOTE },
             { src: PROPERTY_IMAGES.windows, key: "windows" as const, title: "Master Suite", desc: "Spacious room with deck access, workspace, and woodland views." },
           ].map((room) => (
             <article key={room.title} className="overflow-hidden rounded-2xl bg-white shadow-lg">
@@ -72,6 +72,7 @@ export default function RoomsPage() {
               <li key={a} className="text-sm text-stone-600">· {a}</li>
             ))}
           </ul>
+          <p className="mt-6 text-sm leading-relaxed text-stone-600">{LAUNDRY_NOTE}</p>
           <Button href="/book" className="mt-8">Reserve Your Stay</Button>
         </div>
       </div>

@@ -20,6 +20,11 @@ export const RETREAT_PROPERTY = {
   bathroomsDetail:
     "The cottage includes 1.5 bathrooms shared between the living areas and two bedrooms. Layout photos are on our Rooms page.",
   deck: "A private wooded deck with Adirondack seating — ideal for quiet mornings before Bethel.",
+  wifi: "High-speed Wi‑Fi throughout the cottage.",
+  laundry:
+    "Washer and dryer available on request — mention it when booking or contact your host before arrival.",
+  kitchenette:
+    "Light meal prep only — microwave, mini fridge, and coffee station (not a full kitchen).",
 } as const;
 
 export const BOOKING_STEPS = [

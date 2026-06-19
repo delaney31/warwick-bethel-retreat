@@ -5,6 +5,9 @@ export const CANONICAL_SITE_URL = `https://${CANONICAL_HOST}`;
 
 export const SITE_NAME = "Tuxedo Retreat";
 
+/** Primary guest contact — contact form, JSON-LD, and booking inquiries. */
+export const SITE_CONTACT_EMAIL = "bookings@tuxedoretreat.com";
+
 export const SITE_TAGLINE = "Luxury nightly stay near Warwick Bethel";
 
 export const SITE_TITLE = "Lodging Near Warwick Bethel | Tuxedo Retreat";
