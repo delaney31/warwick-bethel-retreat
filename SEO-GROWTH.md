@@ -54,6 +54,14 @@ Some corporate networks block automated requests to `tuxedoretreat.com`. That do
 
 Google crawls from its own infrastructure — verify in Search Console, not only with `curl` from a locked-down network.
 
+**Vercel Bot Protection (Attack Challenge Mode):** If `curl` or Lighthouse gets **403** with `X-Vercel-Mitigated: challenge`, crawlers may be blocked at the edge. In the Vercel project dashboard:
+
+1. **Settings → Security → Bot Protection**
+2. Enable **Allow verified bots** (Googlebot, Bingbot, etc.)
+3. Consider disabling **Attack Challenge Mode** for the production domain, or add an allowlist for monitoring tools you use
+
+Redeploy is not required after changing these settings. Re-run `./scripts/verify-search-indexing.sh` from an unrestricted network after updating.
+
 ---
 
 ## 2. Google Business Profile

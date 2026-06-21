@@ -1,4 +1,5 @@
 import { getCanonicalSiteUrl, SITE_CONTACT_EMAIL, SITE_NAME, SITE_PHONE_TEL } from "@/lib/content/brand";
+import { GUEST_REVIEW_AGGREGATE } from "@/lib/content/guest-reviews";
 import { getSameAsProfileUrls } from "@/lib/content/off-site-listings";
 import { RETREAT_LOCATION } from "@/lib/content/seo-landings/constants";
 import { PROPERTY_IMAGES } from "@/lib/content/property";
@@ -44,6 +45,17 @@ export function lodgingBusinessSchema(): JsonLd {
       addressRegion: "NY",
       addressCountry: "US",
       description: RETREAT_LOCATION.area,
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: RETREAT_LOCATION.geo.latitude,
+      longitude: RETREAT_LOCATION.geo.longitude,
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: GUEST_REVIEW_AGGREGATE.averageRating,
+      reviewCount: GUEST_REVIEW_AGGREGATE.reviewCount,
+      bestRating: 5,
     },
     amenityFeature: [
       { "@type": "LocationFeatureSpecification", name: "Two bedrooms", value: true },

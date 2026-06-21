@@ -10,6 +10,10 @@ export const RETREAT_LOCATION = {
     "Most Bethel visitors reach Warwick Bethel headquarters from the cottage in about fifteen minutes, depending on traffic and time of day.",
   brandNote:
     "Tuxedo Retreat serves Warwick Bethel visitors — a private cottage in the Warwick area, not a general Tuxedo Park resort or unrelated Hudson Valley rental.",
+  geo: {
+    latitude: 41.197,
+    longitude: -74.2024,
+  },
 } as const;
 
 export const RETREAT_PROPERTY = {

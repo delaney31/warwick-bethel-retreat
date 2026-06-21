@@ -7,6 +7,11 @@ import { HomepageWhyStay } from "@/components/public/homepage-why-stay";
 import { BookingFlowSection } from "@/components/public/booking-flow-section";
 import { HomepageFaqPreview } from "@/components/public/homepage-faq-preview";
 import { GalleryPreviewSection } from "@/components/public/gallery-preview-section";
+import { HomepageDirectionsSection } from "@/components/public/homepage-directions-section";
+import { GuestReviewsSection } from "@/components/public/guest-reviews-section";
+import { RoomPackageCards } from "@/components/public/room-package-cards";
+import { AvailabilityPreviewSection } from "@/components/public/availability-preview-section";
+import { WaitlistCtaSection } from "@/components/public/waitlist-cta-section";
 import { FinalCtaSection } from "@/components/public/final-cta-section";
 import { JsonLd } from "@/components/seo/json-ld";
 import { pageMetadata } from "@/lib/content/site-metadata";
@@ -44,10 +49,15 @@ export default function HomePage() {
       <HeroSection />
       <TrustStrip />
       <GalleryPreviewSection />
+      <RoomPackageCards />
       <ExperienceSection />
+      <HomepageDirectionsSection />
+      <AvailabilityPreviewSection />
+      <GuestReviewsSection />
       <HomepageExploreLinks />
       <HomepageWhyStay />
       <BookingFlowSection />
+      <WaitlistCtaSection />
       <HomepageFaqPreview />
       <FinalCtaSection />
     </>

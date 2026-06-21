@@ -45,14 +45,7 @@ export function GalleryPreviewSection() {
         <div className="mt-12 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:grid-rows-2 lg:gap-4">
           {previews.map(({ photo, span, aspect }, i) => {
             if (!photo) return null;
-            const label =
-              photo.room === "main-bedroom"
-                ? "Main bedroom"
-                : photo.room === "second-bedroom"
-                  ? "Second bedroom"
-                  : photo.room === "shared"
-                    ? "Shared space"
-                    : "Exterior";
+            const label = photo.caption;
 
             return (
               <Link
