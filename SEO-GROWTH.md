@@ -46,21 +46,26 @@ chmod +x scripts/verify-search-indexing.sh
 
 ### About 403 / bot blocking
 
-Some corporate networks block automated requests to `tuxedoretreat.com`. That does **not** block Googlebot if:
+**Important:** Vercel does **not** offer an “Allow verified bots” toggle. Googlebot, Bingbot, and other [verified bots](https://vercel.com/docs/bot-management#verified-bots) are **automatically bypassed** by Attack Mode and the Bot Protection ruleset — Vercel validates them (IP ranges, reverse DNS, signatures).
 
-- DNS points to Vercel (`76.76.21.21`)
-- `/robots.txt` allows `/` and lists the sitemap
-- `/sitemap.xml` returns XML (not an auth page)
+That means:
 
-Google crawls from its own infrastructure — verify in Search Console, not only with `curl` from a locked-down network.
+- **`curl`, Lighthouse CLI, and most automated scripts will get 403** — they are not verified bots and cannot pass the JavaScript challenge. This is expected and does **not** mean Google is blocked.
+- **Do not use `curl` alone to judge SEO health.** Use [Google Search Console → URL inspection](https://search.google.com/search-console) to confirm Google can fetch pages.
+- For local Lighthouse, run **Chrome DevTools → Lighthouse** in a normal browser session (already past the challenge), not a headless/corporate-proxy fetch.
 
-**Vercel Bot Protection (Attack Challenge Mode):** If `curl` or Lighthouse gets **403** with `X-Vercel-Mitigated: challenge`, crawlers may be blocked at the edge. In the Vercel project dashboard:
+If you still see real indexing problems (Search Console fetch errors, not just local 403):
 
-1. **Settings → Security → Bot Protection**
-2. Enable **Allow verified bots** (Googlebot, Bingbot, etc.)
-3. Consider disabling **Attack Challenge Mode** for the production domain, or add an allowlist for monitoring tools you use
+1. Open the project in Vercel → **Firewall** → **Bot Management**
+2. **Attack Mode** — disable if you enabled it during an incident and no longer need it (verified bots still pass when on, but Attack Mode challenges all other non-browser traffic)
+3. **Bot Protection** managed ruleset — try **Log** mode first to see what would be challenged; disable or tune if it is too aggressive for your traffic
+4. Confirm no **Custom WAF rule** is blocking `/`, `/robots.txt`, or `/sitemap.xml`
+5. Confirm DNS points to Vercel (`76.76.21.21`) and `/robots.txt` + `/sitemap.xml` return 200 in a real browser
 
-Redeploy is not required after changing these settings. Re-run `./scripts/verify-search-indexing.sh` from an unrestricted network after updating.
+```bash
+chmod +x scripts/verify-search-indexing.sh
+./scripts/verify-search-indexing.sh   # expect 403 from curl if bot protection is active — that is normal
+```
 
 ---
 

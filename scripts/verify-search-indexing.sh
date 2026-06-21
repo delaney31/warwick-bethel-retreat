@@ -48,7 +48,10 @@ done
 
 if [[ "$fail" -ne 0 ]]; then
   echo
-  echo "Some checks failed. If curl shows 403, try from home network or rely on Search Console URL inspection."
+  echo "Some checks failed."
+  echo "If you see HTTP 403 with X-Vercel-Mitigated: challenge, that is normal for curl —"
+  echo "Vercel bot protection blocks non-browser scripts but still allows verified crawlers (Googlebot)."
+  echo "Confirm indexing in Google Search Console URL inspection, or re-run from a browser session."
   exit 1
 fi
 
