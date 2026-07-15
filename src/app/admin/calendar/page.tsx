@@ -47,10 +47,11 @@ export default function AdminCalendarPage() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const formEl = e.currentTarget;
     setSubmitting(true);
     setError(null);
     setSuccess(null);
-    const form = new FormData(e.currentTarget);
+    const form = new FormData(formEl);
     const startDate = String(form.get("startDate") ?? "").trim();
     const endDate = String(form.get("endDate") ?? "").trim();
     const reason = String(form.get("reason") ?? "").trim();
@@ -63,7 +64,7 @@ export default function AdminCalendarPage() {
 
     try {
       await createHostCalendarBlock({ startDate, endDate, reason });
-      e.currentTarget.reset();
+      formEl.reset();
       setSuccess("Dates blocked — guests cannot book paid stays on this range.");
       await load();
     } catch (err) {
