@@ -1,27 +1,45 @@
-import type { Viewport } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
-import { ReservationStoreProvider } from "@/lib/store/reservation-store";
-import { rootMetadata } from "@/lib/content/site-metadata";
+import type { Metadata, Viewport } from "next";
+import { DM_Mono, DM_Sans } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
-const sans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
-const serif = Cormorant_Garamond({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-serif",
+  variable: "--font-dm-sans",
 });
 
-export const metadata = rootMetadata;
+const dmMono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-dm-mono",
+});
 
-export const viewport: Viewport = { themeColor: "#2a241f" };
+export const metadata: Metadata = {
+  title: "Finance King — Your Financial Command Center",
+  description:
+    "Premium personal financial dashboard for cash flow, safe-to-spend, overdraft protection, and debt planning.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Finance King",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a1628",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${serif.variable}`}>
-      <body className="min-h-dvh font-sans antialiased">
-        <ReservationStoreProvider>{children}</ReservationStoreProvider>
-        <Analytics />
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${dmSans.variable} ${dmMono.variable} antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,29 +1,23 @@
-import path from "path";
 import type { NextConfig } from "next";
-import { CANONICAL_SITE_URL, LEGACY_REDIRECT_HOSTS } from "./src/lib/content/brand";
 
-/**
- * Booking, Stripe webhooks, and host admin APIs are implemented in `src/app/api/*`.
- * Do NOT add a catch-all `/api/:path*` rewrite to an external backend — it breaks
- * `/api/booking` in production (requests would hit Render instead of Next.js).
- */
 const nextConfig: NextConfig = {
-  outputFileTracingRoot: path.join(__dirname),
-  images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com" },
-    ],
+  output: "standalone",
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
   },
-  async redirects() {
-    const apex = CANONICAL_SITE_URL;
-    const hostRedirects = LEGACY_REDIRECT_HOSTS.map((host) => ({
-      source: "/:path*",
-      has: [{ type: "host" as const, value: host }],
-      destination: `${apex}/:path*`,
-      permanent: true,
-    }));
-    return hostRedirects;
-  },
+  headers: async () => [
+    {
+      source: "/(.*)",
+      headers: [
+        { key: "X-Frame-Options", value: "DENY" },
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+      ],
+    },
+  ],
 };
 
 export default nextConfig;
